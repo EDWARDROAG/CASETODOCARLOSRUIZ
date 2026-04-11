@@ -1,3 +1,55 @@
-node_modules/
+### AL ###
+# Template for AL projects for Dynamics 365 Business Central
+
+# VS Code
+.vscode/
+
+# AL folders
+.alcache/
+.alpackages/
+.snapshots/
+.output/
+
+# Extension files
+*.app
+
+# RAD
+rad.json
+
+# Translation
+*.g.xlf
+
+# License
+*.flf
+
+# Test results
+TestResults.xml
+
+# Environment
 .env
+
+# Logs
 *.log
+logs/
+
+# Node (IMPORTANTE)
+node_modules/
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.temp
+
+# Git
+.gitignore.lock
+
+# Coverage / testing
+coverage/
+
+# Optional
+dist/
+build/

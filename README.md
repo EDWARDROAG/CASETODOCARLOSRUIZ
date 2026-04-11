@@ -1,3 +1,4 @@
+
 # CASETODO CARLOS RUIZ — Copia independiente (Ideas HTML)
 
 La **plantilla** se mantiene en `soluciones-lamakinet-app/associates/casetodo-carlos-ruiz/`.
@@ -17,3 +18,5 @@ Esta carpeta es la que usa el equipo día a día. Sincronización: `CONFIGURACIO
 1. En `backend/` crear `.env` desde `.env.example`
 2. `docker compose up -d --build`
 3. Probar `GET /api/health`
+=======
+
