@@ -1,0 +1,50 @@
+================================================================================
+CASETODO CARLOS RUIZ — Copia independiente (Ideas HTML / associates)
+================================================================================
+
+FLUJO CON LA “MÁQUINA” LAMAKINET
+---
+La plantilla vive en el monorepo:
+  soluciones-lamakinet-app\associates\casetodo-carlos-ruiz\
+El equipo trabaja y despliega desde ESTA carpeta (Ideas HTML). Cuando la
+plantilla se actualiza, copiar desde allá hacia acá (ver comando abajo) y
+revisar que frontend/n8n-webhook.config.js siga con webhookUrl: "/api/n8n-lead"
+(esa ruta la expone dev-server.mjs en la raíz de este proyecto).
+
+Cuando el sitio ya está en producción, en soluciones-lamakinet-app solo se
+redirige o enlaza la URL pública del asociado.
+
+SINCRONIZAR DESDE LA PLANTILLA (Windows, ejemplo)
+---
+Desde PowerShell o CMD (ajusta rutas si cambian):
+
+  robocopy "RUTA\soluciones-lamakinet-app\associates\casetodo-carlos-ruiz" "RUTA\ideas html\associates\casetodo-carlos-ruiz" /E /XD node_modules /XF .env
+
+No sobrescribas .env local. Tras copiar, confirma n8n-webhook.config.js
+(webhookUrl /api/n8n-lead) y vuelve a probar npm run dev.
+
+ARRANQUE LOCAL
+---
+1) En esta carpeta (raíz): copy .env.example .env
+   Edita .env: N8N_WEBHOOK_URL = URL del Webhook en n8n (modo producción).
+
+2) npm install
+   npm run dev
+
+3) http://127.0.0.1:8080/  (o el PORT de .env)
+
+4) Comprueba que es el dev-server correcto:
+   http://127.0.0.1:8080/api/health  →  "server":"casetodo-dev-server"
+
+El chat “Chat al equipo” envía a /api/n8n-lead; el servidor reenvía a
+N8N_WEBHOOK_URL (evita CORS con n8n en la nube).
+
+Carpeta backend/: API propia con MongoDB (opcional). Para solo web + n8n basta
+npm run dev en la raíz.
+
+Workflow n8n:
+  frontend/n8n-workflow-casetodo-lead-modal.json (prueba, path casetodo-lead-modal)
+  frontend/n8n-workflow-casetodo-lead-modal-gemini.json (structure con Google Gemini, path casetodo-lead-modal-gemini)
+  frontend/n8n-workflow-casetodo-lead-modal-con-notificaciones.json (producción con Gmail/Telegram)
+Para probar Gemini: importa el JSON Gemini, activa, pon esa URL de webhook en N8N_WEBHOOK_URL.
+================================================================================

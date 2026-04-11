@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casetodo Carlos Ruiz | Venta y alquiler de casetones</title>
+  <meta name="description" content="Más de 50 años en venta y alquiler de casetones para todo tipo de obra. Solicita tu cotización por WhatsApp.">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="config.js"></script>
+  <script src="n8n-webhook.config.js"></script>
+  <script src="site-check.js"></script>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <img src="logos/logo.png" alt="Casetodo Carlos Ruiz">
+      <div class="logo-text">
+        <strong>Casetodo Carlos Ruiz</strong>
+        <span>Venta y alquiler de casetones</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="#inicio" class="active">Inicio</a>
+      <a href="#quienes-somos">Quiénes somos</a>
+      <a href="#experiencia">Experiencia</a>
+      <a href="#clientes">Referencias</a>
+      <a href="#casetones">Casetones</a>
+      <a href="#contacto">Cotizar</a>
+      <button type="button" class="nav-assistant" id="open-n8n-modal" aria-haspopup="dialog">
+        Asistente Casetodo
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="inicio" class="hero">
+      <div class="hero-bg-layer is-active"></div>
+      <div class="hero-bg-layer"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="hero-badge">+50 años construyendo confianza</p>
+        <h1>Venta y alquiler de casetones para todo tipo de obra</h1>
+        <p>
+          Soluciones resistentes, entrega oportuna y asesoría técnica para constructoras,
+          contratistas y proyectos arquitectónicos.
+        </p>
+        <div class="hero-cta">
+          <a href="#contacto" class="btn-primary">Solicitar cotización</a>
+          <button type="button" class="btn-secondary btn-open-n8n" id="open-n8n-modal-hero" aria-haspopup="dialog">
+            Hablar con el asistente
+          </button>
+          <a href="https://wa.me/573001234567?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20venta%20o%20alquiler%20de%20casetones." class="btn-secondary btn-wa-hero" target="_blank" rel="noopener">
+            Hablar por WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="quienes-somos" class="section">
+      <div class="section-heading">
+        <h2>Quiénes <span>somos</span></h2>
+      </div>
+      <div class="two-cols">
+        <div>
+          <p>
+            En Casetodo Carlos Ruiz nos especializamos en la venta y alquiler de casetones
+            para obras civiles, estructuras y proyectos de gran escala. Nuestra experiencia
+            nos permite acompañar a cada cliente desde la elección del tipo de casetón hasta
+            la logística de entrega.
+          </p>
+          <p>
+            Trabajamos con enfoque en seguridad, cumplimiento y calidad, entendiendo que el
+            ritmo de obra no se puede detener.
+          </p>
+        </div>
+        <div class="image-card">
+          <img src="https://images.unsplash.com/photo-1485083269755-a7b559a4fe5e?auto=format&fit=crop&w=1200&q=80" alt="Proyecto arquitectónico con estructura en construcción">
+        </div>
+      </div>
+    </section>
+
+    <section id="experiencia" class="section stats">
+      <div class="section-heading">
+        <h2>Nuestra <span>experiencia</span></h2>
+      </div>
+      <div class="stats-grid">
+        <article class="stat-card">
+          <h3 class="stat-counter" data-target="50" data-suffix="+">50+</h3>
+          <p>Años en el sector de la construcción</p>
+        </article>
+        <article class="stat-card">
+          <h3 class="stat-counter" data-target="1200" data-suffix="+">1,200+</h3>
+          <p>Obras atendidas en diferentes etapas</p>
+        </article>
+        <article class="stat-card">
+          <h3 class="stat-counter" data-target="24" data-suffix="h">24h</h3>
+          <p>Respuesta comercial para cotizaciones</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="clientes" class="section">
+      <div class="section-heading">
+        <h2>Clientes que nos <span>recomiendan</span></h2>
+      </div>
+      <div class="cards-grid">
+        <article class="testimonial-card">
+          <p>
+            "Nos cumplieron en tiempos y calidad. El soporte técnico ayudó a optimizar
+            materiales en obra."
+          </p>
+          <h4>Constructora Altavista</h4>
+        </article>
+        <article class="testimonial-card">
+          <p>
+            "Excelente servicio para alquiler de casetón recuperable. Recomendados por
+            su seriedad."
+          </p>
+          <h4>Grupo Ingeniería Vértice</h4>
+        </article>
+        <article class="testimonial-card">
+          <p>
+            "Buena disponibilidad y acompañamiento en campo. Relación costo-beneficio muy
+            favorable."
+          </p>
+          <h4>Arquitectura & Obra SAS</h4>
+        </article>
+      </div>
+    </section>
+
+    <section id="casetones" class="section">
+      <div class="section-heading">
+        <h2>Imágenes y tipos de <span>casetón</span></h2>
+      </div>
+      <div class="cards-grid">
+        <article class="product-card">
+          <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80" alt="Casetón para losa aligerada en estructura">
+          <div class="product-content">
+            <h3>Casetón para losa aligerada</h3>
+            <p>Ideal para reducir peso estructural y optimizar consumo de concreto.</p>
+            <button class="btn-whatsapp-producto" data-producto="Casetón para losa aligerada">Consultar disponibilidad</button>
+          </div>
+        </article>
+
+        <article class="product-card">
+          <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=1200&q=80" alt="Casetón recuperable para obras civiles">
+          <div class="product-content">
+            <h3>Casetón recuperable</h3>
+            <p>Alternativa para proyectos con alta rotación y reaprovechamiento de material.</p>
+            <button class="btn-whatsapp-producto" data-producto="Casetón recuperable">Consultar disponibilidad</button>
+          </div>
+        </article>
+
+        <article class="product-card">
+          <img src="https://images.unsplash.com/photo-1590725121839-892b458a74fe?auto=format&fit=crop&w=1200&q=80" alt="Casetón técnico para obra de gran escala">
+          <div class="product-content">
+            <h3>Casetón técnico especial</h3>
+            <p>Configuraciones a medida para requisitos de obra específicos.</p>
+            <button class="btn-whatsapp-producto" data-producto="Casetón técnico especial">Consultar disponibilidad</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="contacto" class="section quote-section">
+      <div class="section-heading">
+        <h2>Solicita tu <span>cotización</span></h2>
+      </div>
+      <p class="quote-intro">
+        Completa tu requerimiento y te llevamos directamente a WhatsApp con el mensaje listo para enviar.
+      </p>
+
+      <form id="quote-form" class="quote-form">
+        <div class="form-grid">
+          <label>
+            Nombre completo
+            <input type="text" name="nombre" required>
+          </label>
+          <label>
+            Empresa
+            <input type="text" name="empresa" required>
+          </label>
+          <label>
+            Teléfono de contacto
+            <input type="tel" name="telefono" required>
+          </label>
+          <label>
+            Tipo de servicio
+            <select name="servicio" required>
+              <option value="">Selecciona</option>
+              <option value="Venta">Venta</option>
+              <option value="Alquiler">Alquiler</option>
+            </select>
+          </label>
+          <label>
+            Tipo de casetón
+            <select name="tipoCaseton" required>
+              <option value="">Selecciona</option>
+              <option value="Losa aligerada">Losa aligerada</option>
+              <option value="Recuperable">Recuperable</option>
+              <option value="Especial">Especial</option>
+            </select>
+          </label>
+          <label>
+            Cantidad estimada
+            <input type="number" min="1" name="cantidad" required>
+          </label>
+          <label>
+            Ciudad / lugar de obra
+            <input type="text" name="ciudad" required>
+          </label>
+          <label>
+            Fecha requerida
+            <input type="date" name="fecha" required>
+          </label>
+        </div>
+        <label class="full-width">
+          Detalles adicionales del requerimiento
+          <textarea name="detalles" rows="4" placeholder="Área de la losa, plazo, tipo de proyecto, etc." required></textarea>
+        </label>
+        <button type="submit" class="btn-primary">Enviar requerimiento por WhatsApp</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-column">
+        <h3>Casetodo Carlos Ruiz</h3>
+        <p>
+          Venta y alquiler de casetones para todo tipo de obra, con más de 50 años de experiencia.
+        </p>
+      </div>
+      <div class="footer-column">
+        <h3>Contacto</h3>
+        <ul class="contact-list">
+          <li>📞 +57 300 123 4567</li>
+          <li>✉️ comercial@casetodocarlosruiz.com</li>
+          <li>📍 Bogotá, Colombia</li>
+          <li>⏰ Lun - Sáb | 7:00 a.m. - 6:00 p.m.</li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Menú</h3>
+        <ul class="footer-menu">
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#quienes-somos">Quiénes somos</a></li>
+          <li><a href="#casetones">Casetones</a></li>
+          <li><a href="#contacto">Cotizar</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Casetodo Carlos Ruiz. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <div
+    id="n8n-lead-modal"
+    class="n8n-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="n8n-modal-title"
+    hidden
+  >
+    <div class="n8n-modal__backdrop" data-n8n-close="1" tabindex="-1"></div>
+    <div class="n8n-modal__panel">
+      <svg xmlns="http://www.w3.org/2000/svg" class="n8n-modal__sprite-defs" aria-hidden="true" focusable="false">
+        <defs>
+          <symbol id="icon-n8n-asistente-casco" viewBox="0 0 48 48">
+            <ellipse cx="24" cy="33" rx="12" ry="11" fill="#f0d4be" />
+            <ellipse cx="19" cy="32" rx="2" ry="2.2" fill="#2c1810" />
+            <ellipse cx="29" cy="32" rx="2" ry="2.2" fill="#2c1810" />
+            <path
+              d="M18 37.5 Q24 41.5 30 37.5"
+              fill="none"
+              stroke="#9a6b52"
+              stroke-width="1.4"
+              stroke-linecap="round"
+            />
+            <path d="M5 21 L43 21 L40 27 L8 27 Z" fill="#d66816" />
+            <path d="M8 21 C8 9 40 9 40 21 L8 21" fill="#f28c1c" />
+            <path d="M12 19 C12 11 36 11 36 19" fill="#ffc266" opacity="0.45" />
+            <path d="M4 21 h40 v3 H4 z" fill="#c45a12" />
+            <path d="M14 42 L24 47 L34 42" fill="#b41119" />
+          </symbol>
+        </defs>
+      </svg>
+      <header class="n8n-modal__head n8n-modal__head--brand">
+        <div class="n8n-modal__head-main">
+          <div class="n8n-modal__brand-icon-wrap" aria-hidden="true">
+            <svg class="n8n-modal__brand-svg" viewBox="0 0 48 48" width="48" height="48">
+              <use href="#icon-n8n-asistente-casco" />
+            </svg>
+          </div>
+          <div class="n8n-modal__head-text">
+            <h2 id="n8n-modal-title">Asistente Casetodo</h2>
+            <p class="n8n-modal__subtitle">Te ayudamos a dejar claro tu requerimiento · Carlos Ruiz</p>
+          </div>
+        </div>
+        <button type="button" class="n8n-modal__close" id="close-n8n-modal" aria-label="Cerrar">×</button>
+      </header>
+      <p class="n8n-modal__intro">
+        Hablamos desde ya como en un chat de obra: escribes lo que necesitas (y, si quieres, tu nombre y
+        contacto en el mismo mensaje o en varios). Nosotros lo ordenamos y, cuando confirmes, se lo hacemos
+        llegar al equipo humano.
+      </p>
+      <p id="n8n-modal-status" class="n8n-modal__status" role="status" aria-live="polite"></p>
+      <form id="n8n-lead-form" class="n8n-modal__form n8n-modal__form--chat" novalidate>
+        <div id="n8n-chat-layout" class="n8n-chat-layout">
+          <div
+            id="n8n-chat-messages"
+            class="n8n-chat__thread"
+            role="log"
+            aria-label="Mensajes del chat"
+            aria-live="polite"
+          ></div>
+          <div class="n8n-chat__composer">
+            <div class="n8n-chat__composer-row">
+              <textarea
+                id="n8n-chat-input"
+                rows="2"
+                placeholder="Ej.: Hola, soy Ana, mi cel es 300… Necesito cotizar 200 casetones para Bogotá en mayo…"
+                aria-label="Tu mensaje al asistente"
+              ></textarea>
+              <button
+                type="button"
+                class="n8n-modal__mic"
+                id="n8n-mic-btn"
+                aria-pressed="false"
+                aria-label="Dictar por voz"
+                title="Dictar por voz"
+              >
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+                  <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                </svg>
+              </button>
+              <button type="button" class="btn-primary n8n-chat__send-btn" id="n8n-chat-send">Enviar</button>
+            </div>
+            <p id="n8n-mic-hint" class="n8n-modal__mic-hint" aria-live="polite"></p>
+            <p class="n8n-chat__composer-hint">Tip: <kbd>Shift</kbd> + <kbd>Enter</kbd> si quieres varias líneas.</p>
+          </div>
+          <label class="n8n-chat__confirm">
+            <input type="checkbox" id="n8n-confirm-check" />
+            <span>Sí: el resumen dice lo que necesito y quiero enviarlo al equipo</span>
+          </label>
+          <div class="n8n-modal__actions n8n-modal__actions--wrap">
+            <button type="button" class="btn-secondary" data-n8n-close="1">Cerrar</button>
+            <button type="button" class="btn-secondary" id="n8n-btn-skip-ai">Enviar tal cual (sin ordenar)</button>
+            <button type="button" class="btn-primary" id="n8n-btn-final-send" disabled>Enviar al equipo</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <a href="https://wa.me/573001234567?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20casetones." class="whatsapp-float" target="_blank" rel="noopener">
+    <svg class="whatsapp-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <path d="M19.11 17.38c-.27-.14-1.59-.79-1.84-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.31.2-.58.07-.27-.14-1.12-.41-2.14-1.31-.79-.7-1.32-1.56-1.48-1.83-.16-.27-.02-.42.12-.55.12-.12.27-.31.41-.46.14-.16.18-.27.27-.46.09-.18.04-.34-.02-.48-.07-.14-.61-1.47-.84-2.02-.22-.53-.44-.46-.61-.46h-.52c-.18 0-.46.07-.7.34-.24.27-.92.9-.92 2.2s.94 2.56 1.08 2.74c.14.18 1.85 2.82 4.48 3.96.63.27 1.13.44 1.52.56.64.2 1.22.17 1.68.1.51-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.07-.11-.25-.18-.52-.32z"></path>
+      <path d="M16.02 3.2c-7.07 0-12.8 5.73-12.8 12.8 0 2.24.58 4.43 1.68 6.36L3 29l6.83-1.78a12.77 12.77 0 0 0 6.19 1.59h.01c7.07 0 12.8-5.73 12.8-12.8 0-3.4-1.33-6.59-3.74-8.99a12.7 12.7 0 0 0-9.07-3.82zm0 23.46h-.01c-1.91 0-3.78-.51-5.42-1.48l-.39-.23-4.05 1.06 1.08-3.95-.25-.4a10.64 10.64 0 0 1-1.63-5.65c0-5.89 4.79-10.68 10.68-10.68 2.85 0 5.53 1.11 7.54 3.12 2.01 2.02 3.12 4.7 3.12 7.56 0 5.89-4.79 10.68-10.67 10.68z"></path>
+    </svg>
+    <span class="whatsapp-tooltip">¿Necesitas una cotización?</span>
+  </a>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

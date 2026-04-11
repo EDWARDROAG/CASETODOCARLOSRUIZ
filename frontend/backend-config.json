@@ -1,0 +1,72 @@
+{
+  "slug": "casetodo-carlos-ruiz",
+  "vertical": "PUBLICIDAD",
+  "nombre": "CASETODO CARLOS RUIZ",
+  "fecha_creacion": "2026-04-09T12:32:24.674Z",
+  "plan_actual": "FREE",
+  "modulos_activos": [
+    "PORTAFOLIO",
+    "SERVICIOS",
+    "CLIENTES"
+  ],
+  "planes_disponibles": {
+    "BASIC": {
+      "precio": null,
+      "modulos": [
+        "PORTAFOLIO",
+        "SERVICIOS",
+        "CLIENTES",
+        "VENTAS",
+        "INVENTARIO_BASICO"
+      ]
+    },
+    "PREMIUM": {
+      "precio": null,
+      "modulos": [
+        "PORTAFOLIO",
+        "SERVICIOS",
+        "CLIENTES",
+        "VENTAS",
+        "INVENTARIO_ADVANCED",
+        "REPORTES",
+        "MULTI_USUARIO"
+      ]
+    },
+    "ENTERPRISE": {
+      "precio": null,
+      "modulos": [
+        "PORTAFOLIO",
+        "SERVICIOS",
+        "CLIENTES",
+        "VENTAS",
+        "INVENTARIO_ADVANCED",
+        "REPORTES",
+        "MULTI_USUARIO",
+        "API_DEDICADA"
+      ]
+    }
+  },
+  "datos_negocio": {
+    "tipo_agencia": "CASETODO CARLOS RUIZ",
+    "servicios": "VENTA Y ALQUILER DE CASETON ",
+    "años_experiencia": 50
+  },
+  "api_config": {
+    "has_api_key": false,
+    "webhooks": [
+      {
+        "id": "lead_modal_n8n",
+        "descripcion": "URL del nodo Webhook (POST JSON) para el modal en index.html; copiar también en n8n-webhook.config.js",
+        "url": ""
+      }
+    ],
+    "custom_domain": null
+  },
+  "historial_planes": [
+    {
+      "plan": "FREE",
+      "fecha_activacion": "2026-04-09T12:32:24.674Z",
+      "motivo": "Alta inicial"
+    }
+  ]
+}

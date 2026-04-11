@@ -1,0 +1,15 @@
+{
+  "name": "casetodo-carlos-ruiz-sitio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Front Casetodo + proxy n8n (npm run dev en la raíz del asociado)",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "start": "node dev-server.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  }
+}
