@@ -1,0 +1,456 @@
+{
+  "name": "Casetodo — Modal (structure + submit + Gmail + Calendar)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Objetivo\n\n1. **Chat web** (`phase: structure`) → ordena el mensaje y responde JSON con `structuredMensaje`.\n2. **Confirmación** (`phase: submit`) → **Gmail** al equipo + **evento en Google Calendar** (bloque de seguimiento) + opcional **Gmail** al cliente si dejó email.\n\n## Credenciales (n8n)\n- **Gmail** OAuth2 (misma cuenta puede enviar correos).\n- **Google Calendar** OAuth2 (mismo Google Workspace suele bastar).\n\n## Ajustes obligatorios tras importar\n- Nodo **Gmail → asociado**: `sendTo` = correo real del equipo.\n- Nodo **Google Calendar**: elige el **calendario** (lista) donde quieres ver los leads; revisa **Asistentes** si quieres que Google envíe invitación por correo a otra persona.\n- Horario del evento: el Code **Preparar envío equipo** arma **mañana 10:00–10:30** (hora local del servidor n8n). Cambia esa lógica si necesitas otra ventana o zona horaria fija (p. ej. `America/Bogota`).\n\n## Webhook\n- Path: `casetodo-lead-modal` (misma URL que la plantilla con Telegram: **activa solo uno** o cambia el path en el Webhook y en `N8N_WEBHOOK_URL`).\n\n## Front\n- `main.js` ya envía `structure` / `submit` con los mismos campos.\n- `n8n-webhook.config.js` → `webhookUrl` debe apuntar a este workflow en producción.",
+        "height": 720,
+        "width": 460
+      },
+      "id": "note-gcal-001",
+      "name": "📋 Gmail + Calendar",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-200, 40]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "casetodo-lead-modal",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-gcal-001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [380, 420],
+      "webhookId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Unifica cuerpo: n8n a veces entrega el JSON en .body y otras en la raíz.\nconst item = $input.first().json;\nconst body = item.body;\nconst payload =\n  body !== undefined && body !== null && typeof body === 'object' && !Array.isArray(body)\n    ? { ...body }\n    : { ...item };\nreturn [{ json: payload }];"
+      },
+      "id": "code-norm-gcal-001",
+      "name": "Normalizar JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 420]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cond-structure",
+                    "leftValue": "={{ $json.phase }}",
+                    "rightValue": "structure",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "structure"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cond-submit",
+                    "leftValue": "={{ $json.phase }}",
+                    "rightValue": "submit",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "submit"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "otro"
+        }
+      },
+      "id": "switch-gcal-001",
+      "name": "Switch por phase",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [820, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Borrador estructurado sin API externa (sustituir por nodo Gemini si usas el otro workflow).\nconst j = $input.first().json;\nconst msg = String(j.mensaje || '').trim();\nconst intent = String(j.intent || '');\nconst nombre = String(j.nombre || '');\nconst lines = [\n  '--- Solicitud (borrador) ---',\n  `Tipo: ${intent || '—'}`,\n  `Cliente: ${nombre || '—'}`,\n  `Teléfono: ${String(j.telefono || '—')}`,\n  '',\n  'Detalle ordenado:',\n  ''\n];\nif (!msg) {\n  lines.push('(El cliente no escribió detalle en el mensaje.)');\n} else {\n  const chunks = msg\n    .split(/[.\\n;]+/)\n    .map((s) => s.trim())\n    .filter(Boolean);\n  chunks.forEach((c, i) => lines.push(`${i + 1}. ${c}`));\n}\nlines.push('', '--- Fin borrador ---');\nreturn [{ json: { ...j, structuredMensaje: lines.join('\\n') } }];"
+      },
+      "id": "code-structure-gcal-001",
+      "name": "Estructura borrador",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 260]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { structuredMensaje: $json.structuredMensaje } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-structure-gcal-001",
+      "name": "Responder structure",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1320, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\nconst summary = [\n  'NUEVA SOLICITUD (confirmada)',\n  `Asociado: ${j.associateSlug || '—'}`,\n  `Intent: ${j.intent || '—'}`,\n  `Nombre: ${j.nombre || '—'}`,\n  `Tel: ${j.telefono || '—'}`,\n  `Email: ${j.email || '—'}`,\n  `Origen mensaje: ${j.mensajeSource || '—'}`,\n  '',\n  '--- Texto organizado ---',\n  String(j.structuredMensaje || '—'),\n  '',\n  '--- Mensaje original ---',\n  String(j.mensajeOriginal || '—')\n].join('\\n');\n\n// Bloque de agenda: mañana a las 10:00, 30 min (ajusta en n8n si necesitas otra regla)\nconst start = new Date();\nstart.setDate(start.getDate() + 1);\nstart.setHours(10, 0, 0, 0);\nconst end = new Date(start);\nend.setMinutes(end.getMinutes() + 30);\n\nreturn [\n  {\n    json: {\n      ...j,\n      _teamSummary: summary,\n      _receivedAt: new Date().toISOString(),\n      _eventStart: start.toISOString(),\n      _eventEnd: end.toISOString(),\n      _eventTitle: 'Seguimiento lead web — ' + String(j.nombre || 'Casetodo').slice(0, 80)\n    }\n  }\n];"
+      },
+      "id": "code-submit-gcal-001",
+      "name": "Preparar envío equipo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 520]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "primary"
+        },
+        "start": "={{ $json._eventStart }}",
+        "end": "={{ $json._eventEnd }}",
+        "additionalFields": {
+          "summary": "={{ $json._eventTitle }}",
+          "description": "={{ $json._teamSummary }}",
+          "location": "={{ 'Tel: ' + ($json.telefono || '—') + ' · Web modal' }}"
+        }
+      },
+      "id": "gcal-event-001",
+      "name": "Google Calendar — seguimiento",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [1280, 520],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// El nodo Calendar devuelve el evento; recuperamos el lead para Gmail equipo / IF.\nconst prep = $('Preparar envío equipo').first().json;\nconst ev = $input.first().json;\nconst link = ev.htmlLink || ev.hangoutLink || null;\nreturn [{ json: { ...prep, _calendarEventId: ev.id || null, _calendarHtmlLink: link } }];"
+      },
+      "id": "code-restore-after-cal-001",
+      "name": "Recuperar payload lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1480, 520]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "comercial@casetodocarlosruiz.com",
+        "subject": "={{ 'Nueva solicitud web — Casetodo (' + ($json.nombre || 'sin nombre') + ')' }}",
+        "emailType": "text",
+        "message": "={{ $json._teamSummary + ($json._calendarHtmlLink ? '\\n\\nEvento en calendario: ' + $json._calendarHtmlLink : '') }}",
+        "options": {
+          "senderName": "Casetodo Carlos Ruiz (web)"
+        }
+      },
+      "id": "gmail-team-gcal-001",
+      "name": "Gmail → asociado",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1760, 520],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gmail suele devolver metadatos del envío; el IF y la confirmación necesitan el lead.\nreturn [{ json: $('Recuperar payload lead').first().json }];"
+      },
+      "id": "code-after-gmail-team-001",
+      "name": "Mantener datos lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1920, 520]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "em-not-empty",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "em-has-at",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-email-gcal-001",
+      "name": "IF email cliente",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [2080, 520]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "Confirmación — recibimos tu solicitud (Casetodo Carlos Ruiz)",
+        "emailType": "text",
+        "message": "={{ 'Hola ' + ($json.nombre || '') + ',\\n\\nGracias por contactarnos. Hemos recibido tu solicitud y nuestro equipo la revisará pronto.\\n\\nResumen enviado:\\n' + ($json.structuredMensaje || $json.mensajeOriginal || '') + '\\n\\n---\\nCasetodo Carlos Ruiz' }}",
+        "options": {
+          "senderName": "Casetodo Carlos Ruiz"
+        }
+      },
+      "id": "gmail-client-gcal-001",
+      "name": "Gmail confirmación cliente",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [2280, 420],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, received: true, message: 'Listo. Hemos recibido tu solicitud; el equipo te contactará.' } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-submit-gcal-001",
+      "name": "Responder submit",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2520, 520]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { error: \"phase_desconocida\", structuredMensaje: \"\", hint: \"Usa phase structure o submit\" } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-fallback-gcal-001",
+      "name": "Responder error phase",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1080, 720]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalizar JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar JSON": {
+      "main": [
+        [
+          {
+            "node": "Switch por phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch por phase": {
+      "main": [
+        [
+          {
+            "node": "Estructura borrador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preparar envío equipo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder error phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura borrador": {
+      "main": [
+        [
+          {
+            "node": "Responder structure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar envío equipo": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar — seguimiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar — seguimiento": {
+      "main": [
+        [
+          {
+            "node": "Recuperar payload lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recuperar payload lead": {
+      "main": [
+        [
+          {
+            "node": "Gmail → asociado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail → asociado": {
+      "main": [
+        [
+          {
+            "node": "Mantener datos lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mantener datos lead": {
+      "main": [
+        [
+          {
+            "node": "IF email cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF email cliente": {
+      "main": [
+        [
+          {
+            "node": "Gmail confirmación cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder submit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail confirmación cliente": {
+      "main": [
+        [
+          {
+            "node": "Responder submit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

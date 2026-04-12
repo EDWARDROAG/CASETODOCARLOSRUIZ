@@ -2,13 +2,14 @@
  * ======================================================
  * ARCHIVO: n8n-webhook.config.js
  * UBICACIÓN: frontend/ (proyecto independiente: Ideas HTML / associates)
- * VERSIÓN: 1.4 — Misma lógica que la plantilla Lamakinet; proxy local /api/n8n-lead
- * ÚLTIMA ACTUALIZACIÓN: 2026-04-11 19:15
+ * VERSIÓN: 1.5 — GitHub Pages: webhook absoluto; local sigue en /api/n8n-lead
+ * ÚLTIMA ACTUALIZACIÓN: 2026-04-11 16:45
  *
  * 🎯 PROPÓSITO:
  * Centralizar la URL del nodo Webhook (modo POST, JSON) en n8n.
  * El mismo webhook recibe JSON con phase: "structure" o "submit".
  * En la copia independiente: dev-server.mjs (raíz) reenvía a N8N_WEBHOOK_URL (.env).
+ * En GitHub Pages (p. ej. /CASETODOCARLOSRUIZ/) no existe /api: usá N8N_WEBHOOK_URL_PRODUCTION abajo.
  * En soluciones-lamakinet-app suele usarse el proxy del backend global
  * (/api/public/associates/casetodo/n8n-lead); aquí usamos /api/n8n-lead.
  * Nunca uses la URL del editor (/workflow/...?projectId=...).
@@ -22,6 +23,8 @@
  * ======================================================
  * 📋 HISTORIAL DE CAMBIOS:
  * ---
+ * [1.5] - 2026-04-11 16:45
+ * ✅ Detección edwardroag.github.io + path CASETODOCARLOSRUIZ → webhook HTTPS (constante editable)
  * [1.4] - 2026-04-11 19:15
  * ✅ Nota de sincronización con plantilla associates/ en soluciones-lamakinet-app
  *
@@ -40,11 +43,35 @@
  */
 
 (function defineN8nWebhookConfig() {
+  /**
+   * URL del webhook n8n en **producción** (modo Production del nodo Webhook).
+   * Ejemplo: https://n8n.tu-dominio.com/webhook/casetodo-lead-modal
+   * Dejala vacía hasta tener la URL; en GitHub Pages el asistente mostrará el aviso de “no activo”.
+   */
+  var N8N_WEBHOOK_URL_PRODUCTION = "";
+
+  function resolveWebhookUrl() {
+    try {
+      var host = (window.location && window.location.hostname) || "";
+      var path = ((window.location && window.location.pathname) || "").toLowerCase();
+      var onCasetodoGithubPages =
+        host === "edwardroag.github.io" && path.indexOf("casetodocarlosruiz") !== -1;
+      if (onCasetodoGithubPages) {
+        var u = String(N8N_WEBHOOK_URL_PRODUCTION || "").trim();
+        if (u && /^https?:\/\//i.test(u)) {
+          return u;
+        }
+        return "";
+      }
+    } catch (e) {
+      void e;
+    }
+    return "/api/n8n-lead";
+  }
+
   window.CASETODO_N8N = {
-    /**
-     * Mismo origen: dev-server.mjs (raíz) reenvía a N8N_WEBHOOK_URL en .env
-     */
-    webhookUrl: "/api/n8n-lead",
+    /** Local: proxy dev-server → .env | GitHub Pages: N8N_WEBHOOK_URL_PRODUCTION */
+    webhookUrl: resolveWebhookUrl(),
 
     /** Identificador fijo para que n8n filtre por asociado. */
     associateSlug: "casetodo-carlos-ruiz",
