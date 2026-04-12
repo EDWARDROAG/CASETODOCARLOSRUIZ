@@ -2,8 +2,8 @@
  * ======================================================
  * ARCHIVO: main.js
  * UBICACIÓN: associates/casetodo-carlos-ruiz/frontend/js/
- * VERSIÓN: 3.8 - Chat desde el inicio (sin formulario); saludo en front; contacto inferido del texto para n8n
- * ÚLTIMA ACTUALIZACIÓN: 2026-04-12 12:05
+ * VERSIÓN: 4.2 - Pie del asistente compacto; aviso mic solo al pulsar si no hay SR
+ * ÚLTIMA ACTUALIZACIÓN: 2026-04-11 21:40
  *
  * 🎯 PROPÓSITO:
  * Gestionar la interacción del sitio de Casetodo Carlos Ruiz.
@@ -20,6 +20,14 @@
  * ======================================================
  * 📋 HISTORIAL DE CAMBIOS:
  * ---
+ * [4.2] - 2026-04-11 21:40
+ * ✅ Eliminados pie de ayuda, details y casilla; fase 2 en franja mínima; aviso compat. mic como mensaje del bot al intentar usarlo
+ * [4.1] - 2026-04-11 20:15
+ * ✅ Compositor estilo WhatsApp (campo + mic + envío circular); sin placeholder largo; dictados múltiples concatenan y disparan structure/submit tras pausa
+ * [4.0] - 2026-04-12 17:05
+ * ✅ UI asistente alineada a vitrina Yaruba: widget fijo, panel is-open, velo, botón lanzador
+ * [3.9] - 2026-04-12 14:20
+ * ✅ Al abrir modal: aviso explícito si no hay webhookUrl (GitHub sin N8N_WEBHOOK_URL_PRODUCTION o sin n8n-webhook.config.js)
  * [3.8] - 2026-04-12 12:05
  * ✅ Sin paso de casillas: chat visible al abrir; saludo del bot definido en JS (no en n8n); inferencia básica de contacto desde el texto
  *
@@ -206,9 +214,18 @@
   }
 
   function getN8nConfig() {
-    return window.CASETODO_N8N && typeof window.CASETODO_N8N === "object"
-      ? window.CASETODO_N8N
-      : {};
+    const raw =
+      window.CASETODO_N8N && typeof window.CASETODO_N8N === "object"
+        ? window.CASETODO_N8N
+        : {};
+    return {
+      associateSlug: "casetodo-carlos-ruiz",
+      channel: "web_modal_requerimiento",
+      twoPhaseSubmit: true,
+      speechLang: "es-CO",
+      webhookUrl: "",
+      ...raw
+    };
   }
 
   function bindN8nLeadModal() {
@@ -221,17 +238,33 @@
     const chatSend = document.getElementById("n8n-chat-send");
     const btnSkip = document.getElementById("n8n-btn-skip-ai");
     const btnFinal = document.getElementById("n8n-btn-final-send");
-    const chkConfirm = document.getElementById("n8n-confirm-check");
     const micBtn = document.getElementById("n8n-mic-btn");
-    const micHint = document.getElementById("n8n-mic-hint");
+    const phaseActions = document.getElementById("casetodo-chat-phase-actions");
+    const panel = modal.querySelector(".casetodo-chat-panel");
+    const veil = modal.querySelector(".casetodo-chat-widget__veil");
+    const launcher = document.getElementById("casetodo-chat-launcher");
 
-    if (!modal || !form || !chatLayout || !chatMessages || !chatInput) return;
+    if (!modal || !form || !panel || !veil || !chatLayout || !chatMessages || !chatInput) return;
+
+    function isPanelOpen() {
+      return panel.classList.contains("is-open");
+    }
 
     let recognition = null;
     let usedVoiceThisSession = false;
     let micListening = false;
     const sessionMensajeParts = [];
     let lastStructuredText = "";
+    let micAutoSendTimer = null;
+    let micTurnHadTranscript = false;
+    const MIC_SETTLE_MS = 820;
+
+    function clearMicAutoSendTimer() {
+      if (micAutoSendTimer != null) {
+        window.clearTimeout(micAutoSendTimer);
+        micAutoSendTimer = null;
+      }
+    }
 
     const openers = document.querySelectorAll(
       "#open-n8n-modal, #open-n8n-modal-hero"
@@ -245,6 +278,19 @@
 
     function clearAllStatus() {
       setStatus("", false);
+    }
+
+    function warnIfAssistantNotWired(cfg) {
+      const url = String(cfg.webhookUrl || "").trim();
+      if (url) return;
+      const host = (window.location && window.location.hostname) || "";
+      const gh = /github\.io$/i.test(host);
+      setStatus(
+        gh
+          ? "Falta la URL del asistente: en n8n-webhook.config.js definí N8N_WEBHOOK_URL_PRODUCTION (https://…/webhook/…). Si en la consola ves 404 en config.js o n8n-webhook.config.js, subí esos archivos a la raíz del repositorio y hacé push."
+          : "Por ahora no podemos enviar por aquí. Puedes usar el formulario de cotización o escribirnos por WhatsApp.",
+        true
+      );
     }
 
     function scrollChatToEnd() {
@@ -370,13 +416,12 @@
       appendChatMessage(
         "bot",
         "Cuéntame con calma: qué necesitas (casetones, cantidades, ciudad de la obra, fechas…). " +
-          "Si puedes, incluye también tu nombre y un teléfono o correo para que el equipo te responda rápido. " +
-          "Puedes mandar un solo mensaje largo o varios cortitos. También puedes usar el micrófono si tu navegador lo permite."
+          "Podés escribir o dictar con el micrófono: si dictás varias veces, todo se junta en un solo requerimiento y, al terminar de hablar, lo enviamos solos (o usá el botón verde / Enter)."
       );
       if (!twoPhase) {
         appendChatMessage(
           "bot",
-          "Cuando lo tengas listo, pulsa «Enviar» y lo mandamos al equipo de una."
+          "Cuando lo tengas listo, tocá el botón verde de enviar o Enter en el teclado y lo mandamos al equipo de una."
         );
       }
     }
@@ -394,20 +439,16 @@
         micBtn.classList.remove("is-listening");
         micBtn.setAttribute("aria-pressed", "false");
       }
-      if (micHint) micHint.textContent = "";
     }
 
     function setupSpeechRecognition() {
       const cfg = getN8nConfig();
       recognition = null;
-      if (micHint) micHint.textContent = "";
+      clearMicAutoSendTimer();
+      micTurnHadTranscript = false;
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (micBtn) {
-        micBtn.disabled = !SR;
-        if (!SR && micHint) {
-          micHint.textContent =
-            "Tu navegador no permite dictado por voz aquí. Usa Chrome o Edge.";
-        }
+        micBtn.disabled = false;
       }
       if (!micBtn || !SR) return;
       const lang = String(cfg.speechLang || "es-CO").trim() || "es-CO";
@@ -416,36 +457,56 @@
         recognition.lang = lang;
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
+        recognition.onstart = () => {
+          clearMicAutoSendTimer();
+          micTurnHadTranscript = false;
+        };
         recognition.onresult = (event) => {
           const chunk = event.results[0][0].transcript.trim();
           if (!chunk || !chatInput) return;
           usedVoiceThisSession = true;
+          micTurnHadTranscript = true;
           const prev = chatInput.value.trim();
-          const sep = prev && !prev.endsWith(" ") ? " " : "";
+          const sep = prev ? " " : "";
           chatInput.value = (prev + sep + chunk).trim();
         };
         recognition.onerror = () => {
-          if (micHint) micHint.textContent = "No se pudo usar el micrófono. Revisa permisos.";
+          appendChatMessage(
+            "bot",
+            "No se pudo usar el micrófono. Revisá permisos del navegador o probá con Chrome / Edge."
+          );
           stopSpeech();
         };
         recognition.onend = () => {
           stopSpeech();
+          const pending = chatInput ? String(chatInput.value || "").trim() : "";
+          if (micTurnHadTranscript && pending) {
+            micTurnHadTranscript = false;
+            clearMicAutoSendTimer();
+            micAutoSendTimer = window.setTimeout(() => {
+              micAutoSendTimer = null;
+              handleChatSend();
+            }, MIC_SETTLE_MS);
+          } else {
+            micTurnHadTranscript = false;
+          }
         };
       } catch (e) {
         recognition = null;
-        micBtn.disabled = true;
+        if (micBtn) micBtn.disabled = false;
       }
     }
 
     function applyTwoPhaseUi() {
       const cfg = getN8nConfig();
       const two = cfg.twoPhaseSubmit !== false;
+      if (phaseActions) {
+        phaseActions.hidden = !two;
+      }
       if (btnSkip) {
         btnSkip.hidden = !two;
         btnSkip.textContent = "Enviar tal cual (sin ordenar)";
       }
-      const confirmEl = form.querySelector(".n8n-chat__confirm");
-      if (confirmEl) confirmEl.hidden = !two;
       if (btnFinal) {
         btnFinal.hidden = !two;
         if (!two) btnFinal.disabled = true;
@@ -454,30 +515,37 @@
 
     function openModal() {
       const cfg = getN8nConfig();
+      clearMicAutoSendTimer();
       stopSpeech();
       recognition = null;
-      modal.hidden = false;
+      panel.classList.add("is-open");
+      veil.removeAttribute("hidden");
+      modal.setAttribute("aria-hidden", "false");
+      if (launcher) launcher.setAttribute("aria-expanded", "true");
       document.body.style.overflow = "hidden";
       clearAllStatus();
-      chatLayout.hidden = false;
       sessionMensajeParts.length = 0;
       lastStructuredText = "";
       if (chatMessages) chatMessages.textContent = "";
       if (chatInput) chatInput.value = "";
-      if (chkConfirm) chkConfirm.checked = false;
       if (btnFinal) btnFinal.disabled = true;
       applyTwoPhaseUi();
       form.reset();
       setupSpeechRecognition();
       const two = cfg.twoPhaseSubmit !== false;
       pushOpeningGreetings(two);
+      warnIfAssistantNotWired(cfg);
       if (chatInput) chatInput.focus();
     }
 
     function closeModal() {
+      clearMicAutoSendTimer();
       stopSpeech();
       recognition = null;
-      modal.hidden = true;
+      panel.classList.remove("is-open");
+      veil.setAttribute("hidden", "");
+      modal.setAttribute("aria-hidden", "true");
+      if (launcher) launcher.setAttribute("aria-expanded", "false");
       document.body.style.overflow = "";
       clearAllStatus();
       form.reset();
@@ -485,7 +553,6 @@
       lastStructuredText = "";
       if (chatMessages) chatMessages.textContent = "";
       if (chatInput) chatInput.value = "";
-      if (chkConfirm) chkConfirm.checked = false;
       if (btnFinal) btnFinal.disabled = true;
     }
 
@@ -546,16 +613,13 @@
     }
 
     function setChatBusy(busy) {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (chatSend) chatSend.disabled = busy;
       if (btnSkip && !btnSkip.hidden) btnSkip.disabled = busy;
       if (btnFinal && !btnFinal.hidden) {
         btnFinal.disabled = busy || !lastStructuredText;
       }
-      if (micBtn && !busy) {
-        micBtn.disabled = !SR || !recognition;
-      } else if (micBtn && busy) {
-        micBtn.disabled = true;
+      if (micBtn) {
+        micBtn.disabled = Boolean(busy);
       }
     }
 
@@ -616,6 +680,7 @@
     }
 
     async function handleChatSend() {
+      clearMicAutoSendTimer();
       const cfg = getN8nConfig();
       const url = String(cfg.webhookUrl || "").trim();
       const text = chatInput ? String(chatInput.value || "").trim() : "";
@@ -658,12 +723,8 @@
           "bot",
           `Así lo dejé listo para el equipo (puedes leerlo con calma):\n\n${lastStructuredText}`
         );
-        if (chkConfirm) chkConfirm.checked = false;
         if (btnFinal) btnFinal.disabled = false;
-        setStatus(
-          "Si te cuadra, marca la casilla de confirmación y pulsa «Enviar al equipo».",
-          false
-        );
+        setStatus("Si te cuadra el resumen, pulsá «Enviar al equipo» abajo (o «Enviar tal cual»).", false);
       } catch (err) {
         console.warn("[n8n modal structure]", err); // @strip
         sessionMensajeParts.pop();
@@ -682,6 +743,9 @@
     });
 
     chatInput?.addEventListener("keydown", (ev) => {
+      if (!(ev.key === "Enter" && !ev.shiftKey)) {
+        clearMicAutoSendTimer();
+      }
       if (ev.key === "Enter" && !ev.shiftKey) {
         ev.preventDefault();
         handleChatSend();
@@ -705,10 +769,6 @@
       await sendSubmit(base, joined, cfg);
     });
 
-    chkConfirm?.addEventListener("change", () => {
-      /* solo validamos al pulsar Enviar al equipo */ // @strip
-    });
-
     btnFinal?.addEventListener("click", async () => {
       const cfg = getN8nConfig();
       const base = collectBasePayload(cfg);
@@ -716,15 +776,20 @@
         setStatus("Primero mandemos un mensaje para armar el resumen juntos.", true);
         return;
       }
-      if (!chkConfirm || !chkConfirm.checked) {
-        setStatus("Marca la casillita de confirmación cuando estés de acuerdo con el resumen.", true);
-        return;
-      }
       await sendSubmit(base, lastStructuredText, cfg);
     });
 
     openers.forEach((el) => {
       el.addEventListener("click", () => openModal());
+    });
+
+    launcher?.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      if (isPanelOpen()) {
+        closeModal();
+      } else {
+        openModal();
+      }
     });
 
     modal.addEventListener("click", (ev) => {
@@ -739,7 +804,7 @@
     });
 
     document.addEventListener("keydown", (ev) => {
-      if (ev.key === "Escape" && !modal.hidden) {
+      if (ev.key === "Escape" && isPanelOpen()) {
         closeModal();
       }
     });
@@ -750,6 +815,14 @@
     }
 
     micBtn?.addEventListener("click", () => {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        appendChatMessage(
+          "bot",
+          "Tu navegador no permite dictado por voz aquí. Probá con Chrome o Edge en escritorio."
+        );
+        return;
+      }
       if (!recognition || micBtn.disabled) return;
       if (micListening) {
         stopSpeech();
@@ -758,12 +831,11 @@
       micListening = true;
       micBtn.classList.add("is-listening");
       micBtn.setAttribute("aria-pressed", "true");
-      if (micHint) micHint.textContent = "Escuchando… habla cerca del micrófono.";
       try {
         recognition.start();
       } catch (e) {
         stopSpeech();
-        if (micHint) micHint.textContent = "No se pudo iniciar el dictado.";
+        appendChatMessage("bot", "No se pudo iniciar el dictado. Reintentá o escribí el mensaje.");
       }
     });
 

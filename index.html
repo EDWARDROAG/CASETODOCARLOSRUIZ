@@ -6,9 +6,10 @@
   <title>Casetodo Carlos Ruiz | Venta y alquiler de casetones</title>
   <meta name="description" content="Más de 50 años en venta y alquiler de casetones para todo tipo de obra. Solicita tu cotización por WhatsApp.">
   <link rel="stylesheet" href="frontend/styles.css">
-  <script src="frontend/config.js"></script>
-  <script src="frontend/n8n-webhook.config.js"></script>
-  <script src="frontend/site-check.js"></script>
+  <link rel="stylesheet" href="frontend/css/casetodo-assistant-yaruba-panel.css">
+  <script src="config.js"></script>
+  <script src="n8n-webhook.config.js"></script>
+  <script src="site-check.js"></script>
 </head>
 <body>
   <header class="header">
@@ -256,17 +257,24 @@
     </div>
   </footer>
 
-  <div
-    id="n8n-lead-modal"
-    class="n8n-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="n8n-modal-title"
-    hidden
-  >
-    <div class="n8n-modal__backdrop" data-n8n-close="1" tabindex="-1"></div>
-    <div class="n8n-modal__panel">
-      <svg xmlns="http://www.w3.org/2000/svg" class="n8n-modal__sprite-defs" aria-hidden="true" focusable="false">
+  <!-- Asistente: formato flotante (referencia Yaruba — panel + lanzador) -->
+  <div id="n8n-lead-modal" class="casetodo-chat-widget" aria-live="polite" aria-hidden="true">
+    <button
+      type="button"
+      class="casetodo-chat-widget__veil"
+      data-n8n-close="1"
+      tabindex="-1"
+      aria-label="Cerrar asistente"
+      hidden
+    ></button>
+    <div
+      class="casetodo-chat-panel"
+      id="casetodo-chat-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="n8n-modal-title"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="casetodo-chat-sprite-defs" aria-hidden="true" focusable="false">
         <defs>
           <symbol id="icon-n8n-asistente-casco" viewBox="0 0 48 48">
             <ellipse cx="24" cy="33" rx="12" ry="11" fill="#f0d4be" />
@@ -287,72 +295,74 @@
           </symbol>
         </defs>
       </svg>
-      <header class="n8n-modal__head n8n-modal__head--brand">
-        <div class="n8n-modal__head-main">
-          <div class="n8n-modal__brand-icon-wrap" aria-hidden="true">
-            <svg class="n8n-modal__brand-svg" viewBox="0 0 48 48" width="48" height="48">
-              <use href="#icon-n8n-asistente-casco" />
-            </svg>
-          </div>
-          <div class="n8n-modal__head-text">
-            <h2 id="n8n-modal-title">Asistente Casetodo</h2>
-            <p class="n8n-modal__subtitle">Te ayudamos a dejar claro tu requerimiento · Carlos Ruiz</p>
-          </div>
-        </div>
-        <button type="button" class="n8n-modal__close" id="close-n8n-modal" aria-label="Cerrar">×</button>
+      <header class="casetodo-chat-panel__head">
+        <strong id="n8n-modal-title">Asistente Casetodo</strong>
+        <button type="button" class="casetodo-chat-panel__close" id="close-n8n-modal" aria-label="Cerrar">×</button>
       </header>
-      <p class="n8n-modal__intro">
-        Hablamos desde ya como en un chat de obra: escribes lo que necesitas (y, si quieres, tu nombre y
-        contacto en el mismo mensaje o en varios). Nosotros lo ordenamos y, cuando confirmes, se lo hacemos
-        llegar al equipo humano.
-      </p>
-      <p id="n8n-modal-status" class="n8n-modal__status" role="status" aria-live="polite"></p>
-      <form id="n8n-lead-form" class="n8n-modal__form n8n-modal__form--chat" novalidate>
+      <p class="casetodo-chat-panel__subtitle">Te ayudamos a dejar claro tu requerimiento · Carlos Ruiz</p>
+      <p id="n8n-modal-status" class="casetodo-chat-panel__status" role="status" aria-live="polite"></p>
+      <form id="n8n-lead-form" class="casetodo-chat-form" novalidate>
         <div id="n8n-chat-layout" class="n8n-chat-layout">
           <div
             id="n8n-chat-messages"
-            class="n8n-chat__thread"
+            class="casetodo-chat-scroll n8n-chat__thread"
             role="log"
             aria-label="Mensajes del chat"
             aria-live="polite"
           ></div>
+          <div id="casetodo-chat-phase-actions" class="casetodo-chat-phase-actions" hidden>
+            <button type="button" class="casetodo-btn-secondary casetodo-chat-phase-actions__btn" id="n8n-btn-skip-ai">
+              Enviar tal cual (sin ordenar)
+            </button>
+            <button type="button" class="casetodo-btn-primary casetodo-chat-phase-actions__btn" id="n8n-btn-final-send" disabled>
+              Enviar al equipo
+            </button>
+          </div>
           <div class="n8n-chat__composer">
-            <div class="n8n-chat__composer-row">
-              <textarea
-                id="n8n-chat-input"
-                rows="2"
-                placeholder="Ej.: Hola, soy Ana, mi cel es 300… Necesito cotizar 200 casetones para Bogotá en mayo…"
-                aria-label="Tu mensaje al asistente"
-              ></textarea>
-              <button
-                type="button"
-                class="n8n-modal__mic"
-                id="n8n-mic-btn"
-                aria-pressed="false"
-                aria-label="Dictar por voz"
-                title="Dictar por voz"
-              >
-                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
-                  <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-                </svg>
-              </button>
-              <button type="button" class="btn-primary n8n-chat__send-btn" id="n8n-chat-send">Enviar</button>
+            <div class="n8n-chat__composer-wa">
+              <div class="n8n-chat__composer-field">
+                <textarea
+                  id="n8n-chat-input"
+                  rows="1"
+                  placeholder=""
+                  aria-label="Tu mensaje al asistente"
+                ></textarea>
+              </div>
+              <div class="n8n-chat__composer-trailing">
+                <button
+                  type="button"
+                  class="casetodo-chat-mic"
+                  id="n8n-mic-btn"
+                  aria-pressed="false"
+                  aria-label="Dictar por voz (varias veces se une en un solo mensaje)"
+                  title="Dictar por voz"
+                >
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+                    <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="casetodo-chat-send-wa n8n-chat__send-btn"
+                  id="n8n-chat-send"
+                  aria-label="Enviar mensaje"
+                  title="Enviar"
+                >
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+                    <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <p id="n8n-mic-hint" class="n8n-modal__mic-hint" aria-live="polite"></p>
-            <p class="n8n-chat__composer-hint">Tip: <kbd>Shift</kbd> + <kbd>Enter</kbd> si quieres varias líneas.</p>
           </div>
-          <label class="n8n-chat__confirm">
-            <input type="checkbox" id="n8n-confirm-check" />
-            <span>Sí: el resumen dice lo que necesito y quiero enviarlo al equipo</span>
-          </label>
-          <div class="n8n-modal__actions n8n-modal__actions--wrap">
-            <button type="button" class="btn-secondary" data-n8n-close="1">Cerrar</button>
-            <button type="button" class="btn-secondary" id="n8n-btn-skip-ai">Enviar tal cual (sin ordenar)</button>
-            <button type="button" class="btn-primary" id="n8n-btn-final-send" disabled>Enviar al equipo</button>
-          </div>
-        </div>1
+        </div>
       </form>
     </div>
+    <button type="button" class="casetodo-chat-launcher" id="casetodo-chat-launcher" aria-label="Abrir asistente Casetodo" aria-expanded="false" aria-controls="casetodo-chat-panel">
+      <svg class="casetodo-chat-launcher__svg" viewBox="0 0 48 48" width="48" height="48" aria-hidden="true" focusable="false">
+        <use href="#icon-n8n-asistente-casco" />
+      </svg>
+    </button>
   </div>
 
   <a href="https://wa.me/573001234567?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20casetones." class="whatsapp-float" target="_blank" rel="noopener">

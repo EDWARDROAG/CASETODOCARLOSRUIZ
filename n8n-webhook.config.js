@@ -48,7 +48,7 @@
    * Ejemplo: https://n8n.tu-dominio.com/webhook/casetodo-lead-modal
    * Dejala vacía hasta tener la URL; en GitHub Pages el asistente mostrará el aviso de “no activo”.
    */
-  var N8N_WEBHOOK_URL_PRODUCTION = "https://n8n.platform.magnusai.co/webhook-test/casetodo-lead-modal";
+  var N8N_WEBHOOK_URL_PRODUCTION = "";
 
   function resolveWebhookUrl() {
     try {

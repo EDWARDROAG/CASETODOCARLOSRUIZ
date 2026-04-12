@@ -33,8 +33,8 @@ Para **Gmail + Calendar**: crea credenciales OAuth2 en n8n (Gmail y Google Calen
 
 ### GitHub Pages (`https://edwardroag.github.io/CASETODOCARLOSRUIZ/`)
 
-1. El `index.html` de la raíz carga `frontend/n8n-webhook.config.js` (rutas corregidas para que no fallen con 404).
-2. Abrí `frontend/n8n-webhook.config.js` y pegá en **`N8N_WEBHOOK_URL_PRODUCTION`** la URL **https://…** del webhook de n8n (misma que podés tener en `.env` para local). Sin eso, en GitHub Pages el asistente no puede llamar a `/api/n8n-lead`.
+1. El `index.html` de la raíz carga **`config.js`**, **`n8n-webhook.config.js`** y **`site-check.js` en la raíz del repositorio** (GitHub Pages no encuentra archivos que no estén publicados). Hay copia equivalente en `frontend/` para desarrollo; si cambiás la URL del webhook, actualizá **ambos** `n8n-webhook.config.js` o volvé a copiar desde `frontend/` a la raíz.
+2. En **`n8n-webhook.config.js`** pegá en **`N8N_WEBHOOK_URL_PRODUCTION`** la URL **https://…** del webhook de n8n. Sin eso, en GitHub Pages `webhookUrl` queda vacío (no existe `/api/n8n-lead` en github.io).
 3. En n8n, permití **CORS** para el origen `https://edwardroag.github.io` si tu instancia lo exige (o usá un proxy bajo tu dominio).
 
 ## Docker (solo backend)
