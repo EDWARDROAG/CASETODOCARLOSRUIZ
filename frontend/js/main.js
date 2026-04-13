@@ -2,14 +2,14 @@
  * ======================================================
  * ARCHIVO: main.js
  * UBICACIÓN: associates/casetodo-carlos-ruiz/frontend/js/
- * VERSIÓN: 4.2 - Pie del asistente compacto; aviso mic solo al pulsar si no hay SR
- * ÚLTIMA ACTUALIZACIÓN: 2026-04-11 21:40
+ * VERSIÓN: 4.3 - Chat tipo WhatsApp; RAG (ragWebhookUrl); sin saludo largo ni botones fase 2
+ * ÚLTIMA ACTUALIZACIÓN: 2026-04-11 22:50
  *
  * 🎯 PROPÓSITO:
  * Gestionar la interacción del sitio de Casetodo Carlos Ruiz.
  * Construye mensajes para WhatsApp desde botones de productos
  * y desde el formulario de requerimientos de cotización.
- * Modal chat desde el primer mensaje (voz o texto); saludo inicial en front; n8n solo structure/submit.
+ * Modal chat (voz o texto): opcional ragWebhookUrl (phase chat / PDF) y/o webhookUrl (lead structure+submit).
  *
  * ======================================================
  * 📋 REGLAS PARA PRODUCCIÓN:
@@ -20,6 +20,8 @@
  * ======================================================
  * 📋 HISTORIAL DE CAMBIOS:
  * ---
+ * [4.3] - 2026-04-11 22:50
+ * ✅ ragWebhookUrl → POST phase chat y burbuja con reply; sin bloque inicial largo; sin botones; twoPhase+webhook envía al equipo tras structure automático
  * [4.2] - 2026-04-11 21:40
  * ✅ Eliminados pie de ayuda, details y casilla; fase 2 en franja mínima; aviso compat. mic como mensaje del bot al intentar usarlo
  * [4.1] - 2026-04-11 20:15
