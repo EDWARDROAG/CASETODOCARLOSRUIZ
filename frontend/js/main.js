@@ -223,9 +223,11 @@
     return {
       associateSlug: "casetodo-carlos-ruiz",
       channel: "web_modal_requerimiento",
-      twoPhaseSubmit: true,
+      ragChannel: "web_chat_rag",
+      twoPhaseSubmit: false,
       speechLang: "es-CO",
       webhookUrl: "",
+      ragWebhookUrl: "",
       ...raw
     };
   }
@@ -238,10 +240,7 @@
     const chatMessages = document.getElementById("n8n-chat-messages");
     const chatInput = document.getElementById("n8n-chat-input");
     const chatSend = document.getElementById("n8n-chat-send");
-    const btnSkip = document.getElementById("n8n-btn-skip-ai");
-    const btnFinal = document.getElementById("n8n-btn-final-send");
     const micBtn = document.getElementById("n8n-mic-btn");
-    const phaseActions = document.getElementById("casetodo-chat-phase-actions");
     const panel = modal.querySelector(".casetodo-chat-panel");
     const veil = modal.querySelector(".casetodo-chat-widget__veil");
     const launcher = document.getElementById("casetodo-chat-launcher");
@@ -284,13 +283,14 @@
 
     function warnIfAssistantNotWired(cfg) {
       const url = String(cfg.webhookUrl || "").trim();
-      if (url) return;
+      const rag = String(cfg.ragWebhookUrl || "").trim();
+      if (url || rag) return;
       const host = (window.location && window.location.hostname) || "";
       const gh = /github\.io$/i.test(host);
       setStatus(
         gh
-          ? "Falta la URL del asistente: en n8n-webhook.config.js definí N8N_WEBHOOK_URL_PRODUCTION (https://…/webhook/…). Si en la consola ves 404 en config.js o n8n-webhook.config.js, subí esos archivos a la raíz del repositorio y hacé push."
-          : "Por ahora no podemos enviar por aquí. Puedes usar el formulario de cotización o escribirnos por WhatsApp.",
+          ? "Falta URL en n8n-webhook.config.js: N8N_RAG_WEBHOOK_URL_PRODUCTION (chat con PDF) y/o N8N_WEBHOOK_URL_PRODUCTION (equipo). Subí el archivo a la raíz del sitio si ves 404."
+          : "Asistente sin URL: definí ragWebhookUrl o webhookUrl en CASETODO_N8N / n8n-webhook.config.js.",
         true
       );
     }
@@ -405,29 +405,6 @@
       scrollChatToEnd();
     }
 
-    /**
-     * Saludo y primeras líneas del asistente: FRONTEND (no llaman a n8n).
-     * n8n solo entra con phase "structure" / "submit". Para saludo dinámico desde n8n habría que
-     * añadir p.ej. phase "greeting" + Respond to Webhook y un fetch aquí al abrir el modal.
-     */
-    function pushOpeningGreetings(twoPhase) {
-      appendChatMessage(
-        "bot",
-        "¡Hola! Soy el asistente virtual de Casetodo Carlos Ruiz. Estoy aquí para ayudarte a dejar bien claro tu requerimiento."
-      );
-      appendChatMessage(
-        "bot",
-        "Cuéntame con calma: qué necesitas (casetones, cantidades, ciudad de la obra, fechas…). " +
-          "Podés escribir o dictar con el micrófono: si dictás varias veces, todo se junta en un solo requerimiento y, al terminar de hablar, lo enviamos solos (o usá el botón verde / Enter)."
-      );
-      if (!twoPhase) {
-        appendChatMessage(
-          "bot",
-          "Cuando lo tengas listo, tocá el botón verde de enviar o Enter en el teclado y lo mandamos al equipo de una."
-        );
-      }
-    }
-
     function stopSpeech() {
       if (recognition && micListening) {
         try {
@@ -499,22 +476,6 @@
       }
     }
 
-    function applyTwoPhaseUi() {
-      const cfg = getN8nConfig();
-      const two = cfg.twoPhaseSubmit !== false;
-      if (phaseActions) {
-        phaseActions.hidden = !two;
-      }
-      if (btnSkip) {
-        btnSkip.hidden = !two;
-        btnSkip.textContent = "Enviar tal cual (sin ordenar)";
-      }
-      if (btnFinal) {
-        btnFinal.hidden = !two;
-        if (!two) btnFinal.disabled = true;
-      }
-    }
-
     function openModal() {
       const cfg = getN8nConfig();
       clearMicAutoSendTimer();
@@ -530,12 +491,8 @@
       lastStructuredText = "";
       if (chatMessages) chatMessages.textContent = "";
       if (chatInput) chatInput.value = "";
-      if (btnFinal) btnFinal.disabled = true;
-      applyTwoPhaseUi();
       form.reset();
       setupSpeechRecognition();
-      const two = cfg.twoPhaseSubmit !== false;
-      pushOpeningGreetings(two);
       warnIfAssistantNotWired(cfg);
       if (chatInput) chatInput.focus();
     }
@@ -555,7 +512,6 @@
       lastStructuredText = "";
       if (chatMessages) chatMessages.textContent = "";
       if (chatInput) chatInput.value = "";
-      if (btnFinal) btnFinal.disabled = true;
     }
 
     function buildMeta() {
@@ -597,6 +553,37 @@
       return res;
     }
 
+    /**
+     * Webhook n8n RAG (phase chat) — respuesta JSON con campo `reply`.
+     */
+    async function postRagChat(ragUrl, cfg, userText) {
+      const res = await fetch(ragUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phase: "chat",
+          mensaje: userText,
+          associateSlug: String(cfg.associateSlug || "casetodo-carlos-ruiz"),
+          channel: String(cfg.ragChannel || "web_chat_rag"),
+          mensajeSource: usedVoiceThisSession ? "voz" : "texto",
+          metadata: buildMeta()
+        }),
+        mode: "cors",
+        cache: "no-store"
+      });
+      const raw = await res.text();
+      let reply = "";
+      if (res.ok && raw.trim()) {
+        try {
+          const data = JSON.parse(raw);
+          if (typeof data.reply === "string") reply = data.reply.trim();
+        } catch (e) {
+          void e; // @strip
+        }
+      }
+      return { ok: res.ok, reply, status: res.status };
+    }
+
     function parseStructuredMensaje(res) {
       return res.text().then((raw) => {
         const trimmed = raw.trim();
@@ -616,10 +603,6 @@
 
     function setChatBusy(busy) {
       if (chatSend) chatSend.disabled = busy;
-      if (btnSkip && !btnSkip.hidden) btnSkip.disabled = busy;
-      if (btnFinal && !btnFinal.hidden) {
-        btnFinal.disabled = busy || !lastStructuredText;
-      }
       if (micBtn) {
         micBtn.disabled = Boolean(busy);
       }
@@ -677,22 +660,22 @@
         );
       } finally {
         setChatBusy(false);
-        if (btnFinal) btnFinal.disabled = !lastStructuredText;
       }
     }
 
     async function handleChatSend() {
       clearMicAutoSendTimer();
       const cfg = getN8nConfig();
+      const ragUrl = String(cfg.ragWebhookUrl || "").trim();
       const url = String(cfg.webhookUrl || "").trim();
       const text = chatInput ? String(chatInput.value || "").trim() : "";
       if (!text) {
-        setStatus("Cuando puedas, escribe o dicta un mensajito abajo y lo enviamos.", true);
+        setStatus("Escribí o dictá un mensaje y enviá con Enter o el botón verde.", true);
         return;
       }
-      if (!url) {
+      if (!ragUrl && !url) {
         setStatus(
-          "Esta vía no está activa aún. Mientras tanto, cotización o WhatsApp son buenas opciones.",
+          "Falta configurar el asistente (ragWebhookUrl y/o webhookUrl). Revisá n8n-webhook.config.js.",
           true
         );
         return;
@@ -701,6 +684,27 @@
       clearAllStatus();
       appendChatMessage("user", text);
       if (chatInput) chatInput.value = "";
+
+      if (ragUrl) {
+        setStatus("Consultando la guía…", false);
+        setChatBusy(true);
+        try {
+          const { ok, reply, status } = await postRagChat(ragUrl, cfg, text);
+          const out =
+            reply ||
+            (ok
+              ? "No recibí texto de respuesta. Probá de nuevo o escribinos por WhatsApp."
+              : `No pude contactar la guía ahora (código ${status}). Probá más tarde o usá WhatsApp.`);
+          appendChatMessage("bot", out);
+        } catch (err) {
+          console.warn("[rag chat]", err); // @strip
+          appendChatMessage("bot", "Hubo un error de red. Reintentá en un momento o usá WhatsApp.");
+        } finally {
+          setChatBusy(false);
+          clearAllStatus();
+        }
+        return;
+      }
 
       const two = cfg.twoPhaseSubmit !== false;
       if (!two) {
@@ -713,7 +717,7 @@
       sessionMensajeParts.push(text);
       const base = collectBasePayload(cfg);
 
-      setStatus("Dame un segundito, estoy ordenando tu mensaje…", false);
+      setStatus("Ordenando tu mensaje…", false);
       setChatBusy(true);
       try {
         const res = await postWebhook(url, { ...base, phase: "structure" });
@@ -723,18 +727,18 @@
         lastStructuredText = structured.trim();
         appendChatMessage(
           "bot",
-          `Así lo dejé listo para el equipo (puedes leerlo con calma):\n\n${lastStructuredText}`
+          `Resumen para el equipo:\n\n${lastStructuredText}\n\nLo envío tal cual…`
         );
-        if (btnFinal) btnFinal.disabled = false;
-        setStatus("Si te cuadra el resumen, pulsá «Enviar al equipo» abajo (o «Enviar tal cual»).", false);
+        clearAllStatus();
+        await sendSubmit(base, lastStructuredText, cfg);
       } catch (err) {
         console.warn("[n8n modal structure]", err); // @strip
         sessionMensajeParts.pop();
         appendChatMessage(
           "bot",
-          "Uy, ahora mismo no pude ordenar el texto. ¿Lo intentamos otra vez con otras palabras? También puedes usar «Enviar tal cual» y lo mandamos tal como lo escribiste."
+          "No pude ordenar el mensaje ahora. Reintentá con otras palabras o usá el formulario / WhatsApp."
         );
-        setStatus("No pude ordenar el mensaje. Un reintento o «Enviar tal cual» suelen ayudar.", true);
+        setStatus("Reintentá el envío o contactá por WhatsApp.", true);
       } finally {
         setChatBusy(false);
       }
@@ -752,33 +756,6 @@
         ev.preventDefault();
         handleChatSend();
       }
-    });
-
-    btnSkip?.addEventListener("click", async () => {
-      const cfg = getN8nConfig();
-      let raw = chatInput ? String(chatInput.value || "").trim() : "";
-      if (raw) {
-        sessionMensajeParts.push(raw);
-        if (chatInput) chatInput.value = "";
-        appendChatMessage("user", raw);
-      }
-      const joined = joinedMensaje();
-      if (!joined) {
-        setStatus("Escribe algo en el chat primero y lo enviamos con gusto.", true);
-        return;
-      }
-      const base = collectBasePayload(cfg);
-      await sendSubmit(base, joined, cfg);
-    });
-
-    btnFinal?.addEventListener("click", async () => {
-      const cfg = getN8nConfig();
-      const base = collectBasePayload(cfg);
-      if (!lastStructuredText) {
-        setStatus("Primero mandemos un mensaje para armar el resumen juntos.", true);
-        return;
-      }
-      await sendSubmit(base, lastStructuredText, cfg);
     });
 
     openers.forEach((el) => {

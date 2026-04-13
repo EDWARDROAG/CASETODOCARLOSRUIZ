@@ -1,15 +1,15 @@
 /**
  * ======================================================
  * ARCHIVO: n8n-webhook.config.js
- * UBICACIÓN: frontend/ (proyecto independiente: Ideas HTML / associates)
- * VERSIÓN: 1.5 — GitHub Pages: webhook absoluto; local sigue en /api/n8n-lead
- * ÚLTIMA ACTUALIZACIÓN: 2026-04-11 16:45
+ * UBICACIÓN: raíz del sitio Casetodo (copia para GitHub Pages)
+ * VERSIÓN: 1.7 — URL RAG Magnus AI para GitHub Pages (test)
+ * ÚLTIMA ACTUALIZACIÓN: 2026-04-12 12:10
  *
  * 🎯 PROPÓSITO:
  * Centralizar la URL del nodo Webhook (modo POST, JSON) en n8n.
  * El mismo webhook recibe JSON con phase: "structure" o "submit".
  * En la copia independiente: dev-server.mjs (raíz) reenvía a N8N_WEBHOOK_URL (.env).
- * En GitHub Pages (p. ej. /CASETODOCARLOSRUIZ/) no existe /api: usá N8N_WEBHOOK_URL_PRODUCTION abajo.
+ * En GitHub Pages (p. ej. /CASETODOCARLOSRUIZ/) no existe /api: usá N8N_WEBHOOK_URL_PRODUCTION y/o N8N_RAG_WEBHOOK_URL_PRODUCTION abajo.
  * En soluciones-lamakinet-app suele usarse el proxy del backend global
  * (/api/public/associates/casetodo/n8n-lead); aquí usamos /api/n8n-lead.
  * Nunca uses la URL del editor (/workflow/...?projectId=...).
@@ -23,6 +23,10 @@
  * ======================================================
  * 📋 HISTORIAL DE CAMBIOS:
  * ---
+ * [1.7] - 2026-04-12 12:10
+ * ✅ N8N_RAG_WEBHOOK_URL_PRODUCTION apuntando a webhook Production casetodo-rag-chat (Magnus AI)
+ * [1.6] - 2026-04-11 22:55
+ * ✅ ragWebhookUrl (RAG phase chat) con N8N_RAG_WEBHOOK_URL_PRODUCTION en GitHub Pages; twoPhaseSubmit por defecto false en main.js
  * [1.5] - 2026-04-11 16:45
  * ✅ Detección edwardroag.github.io + path CASETODOCARLOSRUIZ → webhook HTTPS (constante editable)
  * [1.4] - 2026-04-11 19:15
@@ -50,6 +54,10 @@
    */
   var N8N_WEBHOOK_URL_PRODUCTION = "";
 
+  /** Webhook del flujo RAG (phase chat) — Production en n8n (Magnus AI). */
+  var N8N_RAG_WEBHOOK_URL_PRODUCTION =
+    "https://n8n.platform.magnusai.co/webhook/casetodo-rag-chat";
+
   function resolveWebhookUrl() {
     try {
       var host = (window.location && window.location.hostname) || "";
@@ -69,9 +77,31 @@
     return "/api/n8n-lead";
   }
 
+  function resolveRagWebhookUrl() {
+    try {
+      var host = (window.location && window.location.hostname) || "";
+      var path = ((window.location && window.location.pathname) || "").toLowerCase();
+      var onCasetodoGithubPages =
+        host === "edwardroag.github.io" && path.indexOf("casetodocarlosruiz") !== -1;
+      if (onCasetodoGithubPages) {
+        var r = String(N8N_RAG_WEBHOOK_URL_PRODUCTION || "").trim();
+        if (r && /^https?:\/\//i.test(r)) {
+          return r;
+        }
+        return "";
+      }
+    } catch (e2) {
+      void e2;
+    }
+    return "";
+  }
+
   window.CASETODO_N8N = {
     /** Local: proxy dev-server → .env | GitHub Pages: N8N_WEBHOOK_URL_PRODUCTION */
     webhookUrl: resolveWebhookUrl(),
+
+    /** Chat con guía PDF (n8n phase chat). GitHub Pages: N8N_RAG_WEBHOOK_URL_PRODUCTION */
+    ragWebhookUrl: resolveRagWebhookUrl(),
 
     /** Identificador fijo para que n8n filtre por asociado. */
     associateSlug: "casetodo-carlos-ruiz",
@@ -79,8 +109,8 @@
     /** Origen lógico del evento (aparece en el JSON enviado). */
     channel: "web_modal_requerimiento",
 
-    /** Si es true: primero "Organizar" (phase structure), luego confirmar y enviar (submit). */
-    twoPhaseSubmit: true,
+    /** Si es true: structure y luego submit automático (sin botones en UI). */
+    twoPhaseSubmit: false,
 
     /** Idioma para el micrófono (dictado en el navegador). */
     speechLang: "es-CO"

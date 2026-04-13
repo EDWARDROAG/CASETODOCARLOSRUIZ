@@ -54,7 +54,6 @@ coverage/
 dist/
 build/
 
-# n8n — exportaciones de workflows y config de webhook (no versionar)
+# n8n — exportaciones de workflows (no versionar; n8n-webhook.config.js sí: GitHub Pages lo necesita en el repo)
 **/n8n-workflow*.json
 **/n8n-*-workflow*.json
-**/n8n-webhook.config.js
