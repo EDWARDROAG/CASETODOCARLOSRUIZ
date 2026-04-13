@@ -55,7 +55,7 @@
       var host = (window.location && window.location.hostname) || "";
       var path = ((window.location && window.location.pathname) || "").toLowerCase();
       var onCasetodoGithubPages =
-        host === "edwardroag.github.io" && path.indexOf("casetodocarlosruiz") !== -1;
+        host === "https://github.com/EDWARDROAG" && path.indexOf("CASETODOCARLOSRUIZ") !== -1;
       if (onCasetodoGithubPages) {
         var u = String(N8N_WEBHOOK_URL_PRODUCTION || "").trim();
         if (u && /^https?:\/\//i.test(u)) {

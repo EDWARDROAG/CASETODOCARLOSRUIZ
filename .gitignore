@@ -53,3 +53,8 @@ coverage/
 # Optional
 dist/
 build/
+
+# n8n — exportaciones de workflows y config de webhook (no versionar)
+**/n8n-workflow*.json
+**/n8n-*-workflow*.json
+**/n8n-webhook.config.js

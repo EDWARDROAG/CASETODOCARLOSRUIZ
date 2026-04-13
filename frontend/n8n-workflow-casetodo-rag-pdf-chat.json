@@ -1,0 +1,238 @@
+{
+  "name": "Casetodo — RAG chat (PDF / KB + phase chat)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Flujo RAG orientado a PDF (Casetodo)\n\n**Webhook:** `POST …/webhook/casetodo-rag-chat`\n\n**Cuerpo JSON mínimo (fase conversación):**\n```json\n{\n  \"phase\": \"chat\",\n  \"mensaje\": \"¿Cuánto cuesta alquilar casetones 2x3?\",\n  \"associateSlug\": \"casetodo-carlos-ruiz\",\n  \"metadata\": { \"pageUrl\": \"…\" }\n}\n```\n\n**Respuesta:** `{ \"reply\": \"…\", \"citas\": [\"…\"], \"modo\": \"demo_reglas\" }`\n\n---\n### Sustituir la “base PDF”\n1. Exportá tu PDF a **texto plano** (o pegá el texto en el nodo **Código — KB desde texto**).\n2. Para vector real (pgvector, Pinecone, Bedrock): reemplazá la rama **chat** por nodos *Embeddings + Vector Store* de n8n.\n\n### OpenAI (opcional)\nDescomentá / añadí un nodo **HTTP Request** a `api.openai.com/v1/chat/completions` usando el `systemPrompt` y el `userPrompt` que arma el nodo **RAG — contexto + prompts**.",
+        "height": 520,
+        "width": 420
+      },
+      "id": "sticky-overview-001",
+      "name": "📋 Resumen flujo",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-380, 40]
+    },
+    {
+      "parameters": {
+        "content": "## SYSTEM PROMPT (copiar al LLM)\n\nEres el asistente virtual de **Casetodo Carlos Ruiz**. Solo vendemos y alquilamos **casetones** (casetas modulares tipo obra). No ofreces otros productos ni servicios.\n\n**Reglas:**\n1. Basa tus respuestas **únicamente** en el bloque titulado «CONTEXTO DE LA EMPRESA (extraído de documentos internos)». Si algo no está ahí, dilo con claridad y ofrece derivar al equipo humano o pedir medidas, ciudad y fechas.\n2. Si el usuario pide algo **fuera de alcance** (otro rubro, legal, salud, política, chistes sin fin, etc.), responde con cortesía que **solo puedes ayudar con información de casetones (venta y alquiler)** y redirige a WhatsApp o formulario de cotización si aplica.\n3. Sé breve, claro y en **español** (Colombia si el usuario escribe en ese registro). Usa viñetas cuando ayuden.\n4. No inventes precios ni plazos: si el contexto no los trae, no los afirmes; sugiere que un asesor confirme.\n5. Si detectas **intención de cotización** (medidas, cantidad, ciudad, obra), resume lo que falta en una sola lista y anima a completar datos.\n\n**Formato de salida:** solo texto conversacional para el usuario (sin JSON ni markdown pesado salvo listas simples).",
+        "height": 620,
+        "width": 380
+      },
+      "id": "sticky-prompt-001",
+      "name": "🧠 SYSTEM PROMPT (RAG)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [80, -120]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "casetodo-rag-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-rag-001",
+      "name": "Webhook RAG",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [380, 320],
+      "webhookId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst body = item.body;\nconst payload =\n  body !== undefined && body !== null && typeof body === 'object' && !Array.isArray(body)\n    ? { ...body }\n    : { ...item };\nreturn [{ json: payload }];"
+      },
+      "id": "code-normalize-rag-001",
+      "name": "Normalizar JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 320]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c-chat",
+                    "leftValue": "={{ String($json.phase || '').toLowerCase() }}",
+                    "rightValue": "chat",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "chat"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "otro"
+        }
+      },
+      "id": "switch-phase-rag-001",
+      "name": "Switch phase",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [820, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Texto base = simulación de \"PDF\" ya extraído a texto.\n * Reemplazá el contenido de TEXTO_KB_PDF por el extracto real de tu PDF.\n */\nconst TEXTO_KB_PDF = `\n=== CASETODO CARLOS RUIZ — GUÍA RÁPIDA (INTERNO) ===\n\nQué es un casetón: módulo prefabricado para obra (oficina, vestuario, bodega temporal). Materiales y medidas estándar según catálogo.\n\nServicios: VENTA de casetones y ALQUILER por periodos (día / semana / mes según disponibilidad y zona). No alquilamos maquinaria ni andamios.\n\nMedidas frecuentes (ejemplos): 2x2 m, 2x3 m, 3x6 m. Medidas especiales: consultar stock y transporte.\n\nPrecios orientativos (sujetos a confirmación): alquiler desde referencia según tamaño y ciudad; cotización formal requiere dirección de obra o ciudad, fechas y cantidad.\n\nZona: atención principal Colombia; envíos/traslado dependen de distancia.\n\nPlazos: disponibilidad variable; en temporada alta puede haber lista de espera.\n\nCómo cotizar: nombre, teléfono, ciudad de la obra, medidas deseadas o módulos, fecha de inicio y duración aproximada.\n\nPolítica: no damos asesoría legal ni estructural de edificios fijos; solo producto casetón.\n\nContacto: equipo comercial revisa solicitudes vía web y WhatsApp.\n`.trim();\n\nconst SEP = '\\n---CHUNK---\\n';\nconst rawChunks = TEXTO_KB_PDF.split(/\\n{2,}/).map((s) => s.trim()).filter(Boolean);\nconst chunks = rawChunks.length ? rawChunks : [TEXTO_KB_PDF];\n\nconst j = $input.first().json;\nreturn [{ json: { ...j, _kbChunks: chunks, _kbVersion: 'demo-pdf-v1' } }];"
+      },
+      "id": "code-kb-pdf-text-001",
+      "name": "KB desde texto (PDF simulado)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1060, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\nconst q = String(j.mensaje || j.message || '').toLowerCase().trim();\nconst chunks = Array.isArray(j._kbChunks) ? j._kbChunks : [];\n\nfunction score(text, query) {\n  if (!query) return 0;\n  const words = query.split(/[^a-záéíóúñ0-9]+/i).filter((w) => w.length > 2);\n  const t = text.toLowerCase();\n  let s = 0;\n  for (const w of words) {\n    if (t.includes(w)) s += 2;\n  }\n  if (/caseton|casetón|caseta|obra|alquiler|venta|precio|medida|cotiz/.test(t) && /caseton|casetón|caseta|obra|alquiler|venta|precio|medida|cotiz/.test(query)) s += 1;\n  return s;\n}\n\nconst ranked = chunks\n  .map((c, i) => ({ i, c, s: score(c, q) }))\n  .sort((a, b) => b.s - a.s);\n\nconst top = ranked.filter((x) => x.s > 0).slice(0, 5).map((x) => x.c);\nconst picked = top.length ? top : ranked.slice(0, 3).map((x) => x.c);\nconst contexto = picked.join('\\n\\n———\\n\\n');\n\nconst systemPrompt = `Eres el asistente virtual de Casetodo Carlos Ruiz. Solo vendemos y alquilamos casetones. Basa la respuesta SOLO en el CONTEXTO. Si falta información, dilo y pide datos para cotizar o deriva al equipo. Español, breve. No inventes precios ni plazos no presentes en el contexto.`;\n\nconst userPrompt = `PREGUNTA DEL CLIENTE:\\n${String(j.mensaje || '').trim() || '(vacío)'}\\n\\nCONTEXTO DE LA EMPRESA (extraído de documentos internos):\\n${contexto || '(sin coincidencias en la guía; responde que no hay dato en la guía y pide aclaración o contacto).'}`;\n\nreturn [\n  {\n    json: {\n      ...j,\n      _ragContexto: contexto,\n      _ragCitas: picked.map((c) => c.slice(0, 160).replace(/\\s+/g, ' ') + (c.length > 160 ? '…' : '')),\n      systemPrompt,\n      userPrompt,\n      _openaiBody: {\n        model: 'gpt-4o-mini',\n        temperature: 0.35,\n        messages: [\n          { role: 'system', content: systemPrompt },\n          { role: 'user', content: userPrompt }\n        ]\n      }\n    }\n  }\n];"
+      },
+      "id": "code-rag-context-001",
+      "name": "RAG — contexto + prompts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1280, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\nconst ctx = String(j._ragContexto || '').trim();\nconst q = String(j.mensaje || '').trim();\n\nlet reply = '';\nif (!q) {\n  reply =\n    'Hola, soy el asistente de Casetodo Carlos Ruiz. Estoy para ayudarte con **venta y alquiler de casetones**. ¿Qué medidas o ciudad de obra necesitás?';\n} else if (!ctx) {\n  reply =\n    'Hola. Con lo que contás no encontré una coincidencia clara en nuestra guía interna. Recordá que en Casetodo solo trabajamos **casetones (venta y alquiler)**. Pasame medidas aproximadas, ciudad y si es alquiler o compra, y lo vemos con el equipo.';\n} else {\n  reply = [\n    'Hola, gracias por tu consulta.',\n    '',\n    'Según la información que manejamos sobre casetones (venta y alquiler):',\n    '',\n    ctx.slice(0, 2800),\n    '',\n    'Si necesitás **cotización con precio confirmado**, indicá ciudad de la obra, medidas o referencia del módulo y fechas aproximadas; un asesor lo valida.'\n  ].join('\\n');\n}\n\nreturn [{ json: { ...j, reply, citas: j._ragCitas || [], modo: 'demo_reglas' } }];"
+      },
+      "id": "code-reply-demo-001",
+      "name": "Respuesta demo (sin API LLM)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1520, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { reply: $json.reply, citas: $json.citas || [], modo: $json.modo || 'demo_reglas', associateSlug: $json.associateSlug } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-chat-001",
+      "name": "Responder chat",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1760, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { error: \"phase_invalida\", hint: \"Usa phase=chat con campo mensaje\", reply: \"\", citas: [] } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-phase-error-001",
+      "name": "Responder error phase",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1060, 520]
+    }
+  ],
+  "connections": {
+    "Webhook RAG": {
+      "main": [
+        [
+          {
+            "node": "Normalizar JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar JSON": {
+      "main": [
+        [
+          {
+            "node": "Switch phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch phase": {
+      "main": [
+        [
+          {
+            "node": "KB desde texto (PDF simulado)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder error phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KB desde texto (PDF simulado)": {
+      "main": [
+        [
+          {
+            "node": "RAG — contexto + prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAG — contexto + prompts": {
+      "main": [
+        [
+          {
+            "node": "Respuesta demo (sin API LLM)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuesta demo (sin API LLM)": {
+      "main": [
+        [
+          {
+            "node": "Responder chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "RAG ligero: texto tipo PDF en Code + recuperación por palabras clave; respuesta demo sin OpenAI. Añadí HTTP OpenAI usando _openaiBody cuando quieras."
+  }
+}
