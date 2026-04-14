@@ -34,8 +34,11 @@ Para **Gmail + Calendar**: crea credenciales OAuth2 en n8n (Gmail y Google Calen
 ### GitHub Pages (`https://edwardroag.github.io/CASETODOCARLOSRUIZ/`)
 
 1. El `index.html` de la raíz carga **`config.js`**, **`n8n-webhook.config.js`** y **`site-check.js` en la raíz del repositorio** (GitHub Pages no encuentra archivos que no estén publicados). Hay copia equivalente en `frontend/` para desarrollo; si cambiás la URL del webhook, actualizá **ambos** `n8n-webhook.config.js` o volvé a copiar desde `frontend/` a la raíz.
-2. En **`n8n-webhook.config.js`** pegá en **`N8N_WEBHOOK_URL_PRODUCTION`** la URL **https://…** del webhook de n8n. Sin eso, en GitHub Pages `webhookUrl` queda vacío (no existe `/api/n8n-lead` en github.io).
-3. En n8n, permití **CORS** para el origen `https://edwardroag.github.io` si tu instancia lo exige (o usá un proxy bajo tu dominio).
+2. **Chat RAG:** en **`N8N_RAG_WEBHOOK_URL_PRODUCTION`** va la URL que el **navegador** puede llamar. La URL directa de n8n (`https://n8n…/webhook/casetodo-rag-chat`) suele fallar con **CORS** desde `github.io` si el servidor no envía `Access-Control-Allow-Origin`. Soluciones:
+   - **A (recomendada en Magnus):** que habiliten CORS para el origen `https://edwardroag.github.io` en el proxy frente a n8n.
+   - **B:** desplegar el **Cloudflare Worker** de ejemplo `cloudflare-worker-rag-cors-proxy.js` (Wrangler → `wrangler deploy`) y pegar la URL `https://….workers.dev` en **`N8N_RAG_WEBHOOK_URL_PRODUCTION`** en lugar de la URL directa de n8n.
+3. **Lead al equipo:** en **`N8N_WEBHOOK_URL_PRODUCTION`** la URL **https://…** del webhook de solicitudes (si lo usás). En Pages no existe `/api/n8n-lead` salvo que montes otro proxy.
+4. **Local (`npm run dev`):** el front usa **`/api/n8n-rag`** (mismo origen). Definí **`N8N_RAG_WEBHOOK_URL`** en `.env` apuntando al webhook Production de n8n; el `dev-server.mjs` reenvía el POST.
 
 ## Docker (solo backend)
 1. En `backend/` crear `.env` desde `.env.example`

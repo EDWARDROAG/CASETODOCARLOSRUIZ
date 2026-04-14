@@ -52,14 +52,19 @@
    * Ejemplo: https://n8n.tu-dominio.com/webhook/casetodo-lead-modal
    * Dejala vacía hasta tener la URL; en GitHub Pages el asistente mostrará el aviso de “no activo”.
    */
-  var N8N_WEBHOOK_URL_PRODUCTION = "";
+  var N8N_WEBHOOK_URL_PRODUCTION = "https://n8n.platform.magnusai.co/webhook-test/casetodo-web-chat-v2";
 
-  /** Webhook del flujo RAG (phase chat) — Production en n8n (Magnus AI). */
+  /**
+   * GitHub Pages: URL que ve el navegador. Si n8n bloquea CORS, no uses la URL directa de n8n:
+   * desplegá el Worker en `cloudflare-worker-rag-cors-proxy.js` y pegá aquí la URL https del Worker.
+   * O pedí a Magnus que permitan origen https://edwardroag.github.io en el proxy de n8n.
+   */
   var N8N_RAG_WEBHOOK_URL_PRODUCTION =
-    "https://n8n.platform.magnusai.co/webhook/casetodo-rag-chat";
+    "https://n8n.platform.magnusai.co/webhook-test/casetodo-web-chat-v2";
 
   function resolveWebhookUrl() {
     try {
+      
       var host = (window.location && window.location.hostname) || "";
       var path = ((window.location && window.location.pathname) || "").toLowerCase();
       var onCasetodoGithubPages =
@@ -81,6 +86,10 @@
     try {
       var host = (window.location && window.location.hostname) || "";
       var path = ((window.location && window.location.pathname) || "").toLowerCase();
+      /** Mismo origen: dev-server reenvía a n8n (sin CORS). Requiere .env N8N_RAG_WEBHOOK_URL + npm run dev */
+      if (host === "127.0.0.1" || host === "localhost") {
+        return "/api/n8n-rag";
+      }
       var onCasetodoGithubPages =
         host === "edwardroag.github.io" && path.indexOf("casetodocarlosruiz") !== -1;
       if (onCasetodoGithubPages) {

@@ -2,14 +2,14 @@
  * ======================================================
  * ARCHIVO: main.js
  * UBICACIÓN: associates/casetodo-carlos-ruiz/frontend/js/
- * VERSIÓN: 4.3 - Chat tipo WhatsApp; RAG (ragWebhookUrl); sin saludo largo ni botones fase 2
- * ÚLTIMA ACTUALIZACIÓN: 2026-04-11 22:50
+ * VERSIÓN: 5.0 - Sin captación en front: solo mensaje + metadata; n8n infiere y guarda historial
+ * ÚLTIMA ACTUALIZACIÓN: 2026-04-13
  *
  * 🎯 PROPÓSITO:
  * Gestionar la interacción del sitio de Casetodo Carlos Ruiz.
  * Construye mensajes para WhatsApp desde botones de productos
  * y desde el formulario de requerimientos de cotización.
- * Modal chat (voz o texto): opcional ragWebhookUrl (phase chat / PDF) y/o webhookUrl (lead structure+submit).
+ * Modal chat (voz o texto): ragWebhookUrl (phase chat) y/o webhookUrl (solo submit con el texto enviado).
  *
  * ======================================================
  * 📋 REGLAS PARA PRODUCCIÓN:
@@ -20,6 +20,26 @@
  * ======================================================
  * 📋 HISTORIAL DE CAMBIOS:
  * ---
+ * [5.0] - 2026-04-13
+ * ✅ Eliminada inferencia intent/contacto en front; submit solo mensaje + metadata. RAG sin `conversation`
+ *
+ * [4.9] - 2026-04-13
+ * ✅ RAG: body solo `mensaje` + `conversation: []` (contexto en n8n); sin two-phase/structure en el chat
+ *
+ * [4.8] - 2026-04-13
+ * ✅ Chat RAG: historial conversation con role assistant + user; metadata.ragSessionId por sesión de modal
+ *
+ * [4.7] - 2026-04-13
+ * ✅ postRagChat: tolera JSON de n8n (reply, output, text, body/json, arrays, choices OpenAI)
+ *
+ * [4.6] - 2026-04-12 16:40
+ * ✅ postRagChat incluye `conversation` (últimos turnos) para orquestación de saludo/datos
+ * [4.5] - 2026-04-12 16:05
+ * ✅ Texto de ayuda cuando el proxy devuelve 404 desde n8n (Production / workflow activo)
+ * [4.4] - 2026-04-12 14:12
+ * ✅ postRagChat: metadata gestor (pasoActual, nombre, telefono, email) ↔ n8n; el modal no se cierra entre turnos (solo al enviar al equipo o cerrar).
+ * ✅ n8n Gestor: si el primer mensaje no es solo un saludo, se toma como nombre y se pide el teléfono.
+ * ✅ postRagChat captura fallos de red/CORS; localhost usa /api/n8n-rag (dev-server)
  * [4.3] - 2026-04-11 22:50
  * ✅ ragWebhookUrl → POST phase chat y burbuja con reply; sin bloque inicial largo; sin botones; twoPhase+webhook envía al equipo tras structure automático
  * [4.2] - 2026-04-11 21:40
@@ -254,8 +274,18 @@
     let recognition = null;
     let usedVoiceThisSession = false;
     let micListening = false;
-    const sessionMensajeParts = [];
-    let lastStructuredText = "";
+    let ragSessionId = "";
+    /** Estado del gestor n8n (nombre, teléfono, email, paso); se reenvía en metadata cada POST chat. */
+    let gestorState = {
+      pasoActual: "",
+      nombre: "",
+      telefono: "",
+      email: "",
+      requerimiento: "",
+      enviarCotizacionTelegram: false,
+      enviarCotizacionCorreoEquipo: false,
+      enviarConfirmacionCliente: false
+    };
     let micAutoSendTimer = null;
     let micTurnHadTranscript = false;
     const MIC_SETTLE_MS = 820;
@@ -313,47 +343,6 @@
       const word = t.split(/\s+/).find((w) => /[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(w));
       if (word) return word.charAt(0).toUpperCase();
       return "Tú";
-    }
-
-    function inferIntentFromText(full) {
-      const x = String(full || "").toLowerCase();
-      if (/visita|cita en obra|ir a la obra|obra en/.test(x)) return "visita";
-      if (/reuni[oó]n|llamad[ao]|videollamada/.test(x)) return "reunion";
-      if (/cotiz|precio|presupuesto|cu[aá]nto|necesito\s+\d/.test(x)) return "cotizacion";
-      return "otro";
-    }
-
-    /**
-     * Campos que antes venían del formulario: se infieren del texto del chat (heurística simple).
-     */
-    function inferContactFromChat(fullText) {
-      const t = String(fullText || "");
-      let nombre = "";
-      let telefono = "";
-      let email = "";
-      const em = t.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-      if (em) email = em[0].trim();
-      const ph =
-        t.match(/\b3\d{9}\b/) ||
-        t.match(/\+\s*57\s*3\d{9}\b/) ||
-        t.match(/\b60\d{8}\b/) ||
-        t.match(/\b\d{10}\b/);
-      if (ph) telefono = ph[0].replace(/\s/g, "");
-      const nm =
-        t.match(/me llamo\s+([^\n,\.!]+)/i) ||
-        t.match(/mi nombre es\s+([^\n,\.!]+)/i) ||
-        t.match(/^soy\s+([^\n,\.!\d]+)/im);
-      if (nm) nombre = nm[1].trim().split(/[\n,]/)[0].slice(0, 80);
-      if (!nombre) {
-        const first = t.split("\n")[0].trim();
-        if (first && first.length < 55 && !/\d{9,}/.test(first)) nombre = first;
-      }
-      return {
-        intent: inferIntentFromText(t),
-        nombre: nombre || "Cliente (chat web)",
-        telefono: telefono || "Por confirmar (chat)",
-        email: email || ""
-      };
     }
 
     function appendBotAvatar(container) {
@@ -487,8 +476,20 @@
       if (launcher) launcher.setAttribute("aria-expanded", "true");
       document.body.style.overflow = "hidden";
       clearAllStatus();
-      sessionMensajeParts.length = 0;
-      lastStructuredText = "";
+      ragSessionId =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : "casetodo-" + String(Date.now()) + "-" + String(Math.random()).slice(2, 11);
+      gestorState = {
+        pasoActual: "",
+        nombre: "",
+        telefono: "",
+        email: "",
+        requerimiento: "",
+        enviarCotizacionTelegram: false,
+        enviarCotizacionCorreoEquipo: false,
+        enviarConfirmacionCliente: false
+      };
       if (chatMessages) chatMessages.textContent = "";
       if (chatInput) chatInput.value = "";
       form.reset();
@@ -508,35 +509,83 @@
       document.body.style.overflow = "";
       clearAllStatus();
       form.reset();
-      sessionMensajeParts.length = 0;
-      lastStructuredText = "";
+      ragSessionId = "";
+      gestorState = {
+        pasoActual: "",
+        nombre: "",
+        telefono: "",
+        email: "",
+        requerimiento: "",
+        enviarCotizacionTelegram: false,
+        enviarCotizacionCorreoEquipo: false,
+        enviarConfirmacionCliente: false
+      };
       if (chatMessages) chatMessages.textContent = "";
       if (chatInput) chatInput.value = "";
     }
 
+    function syncGestorFromResponse(data) {
+      if (data == null) return;
+      if (Array.isArray(data) && data.length) {
+        syncGestorFromResponse(data[0]);
+        return;
+      }
+      if (typeof data !== "object") return;
+      let layer = { ...data };
+      if (data.data != null && typeof data.data === "object" && !Array.isArray(data.data)) {
+        layer = { ...data.data, ...layer };
+      }
+      const md =
+        layer.metadata && typeof layer.metadata === "object" ? layer.metadata : {};
+      const keys = ["pasoActual", "nombre", "telefono", "email", "requerimiento"];
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        let v;
+        if (Object.prototype.hasOwnProperty.call(layer, k)) v = layer[k];
+        else if (Object.prototype.hasOwnProperty.call(md, k)) v = md[k];
+        else continue;
+        gestorState[k] = String(v ?? "");
+      }
+      const boolKeys = [
+        "enviarCotizacionTelegram",
+        "enviarCotizacionCorreoEquipo",
+        "enviarConfirmacionCliente"
+      ];
+      for (let b = 0; b < boolKeys.length; b++) {
+        const bk = boolKeys[b];
+        let bv;
+        if (Object.prototype.hasOwnProperty.call(layer, bk)) bv = layer[bk];
+        else if (Object.prototype.hasOwnProperty.call(md, bk)) bv = md[bk];
+        else continue;
+        gestorState[bk] = bv === true || String(bv).toLowerCase() === "true";
+      }
+    }
+
     function buildMeta() {
-      return {
+      const meta = {
         pageUrl: window.location.href,
         userAgent: navigator.userAgent,
         sentAt: new Date().toISOString()
       };
+      if (ragSessionId) meta.ragSessionId = ragSessionId;
+      meta.pasoActual = gestorState.pasoActual || "";
+      meta.nombre = gestorState.nombre || "";
+      meta.telefono = gestorState.telefono || "";
+      meta.email = gestorState.email || "";
+      meta.requerimiento = gestorState.requerimiento || "";
+      meta.enviarCotizacionTelegram = Boolean(gestorState.enviarCotizacionTelegram);
+      meta.enviarCotizacionCorreoEquipo = Boolean(gestorState.enviarCotizacionCorreoEquipo);
+      meta.enviarConfirmacionCliente = Boolean(gestorState.enviarConfirmacionCliente);
+      return meta;
     }
 
-    function joinedMensaje() {
-      return sessionMensajeParts.join("\n\n").trim();
-    }
-
-    function collectBasePayload(cfg) {
-      const joined = joinedMensaje();
-      const inferred = inferContactFromChat(joined);
+    /** Payload mínimo para submit al equipo: el texto va crudo; intent/datos los resuelve n8n. */
+    function collectBasePayloadFromMessage(singleText, cfg) {
+      const t = String(singleText || "").trim();
       return {
         associateSlug: String(cfg.associateSlug || "casetodo-carlos-ruiz"),
         channel: String(cfg.channel || "web_modal_requerimiento"),
-        intent: inferred.intent,
-        nombre: inferred.nombre,
-        telefono: inferred.telefono,
-        email: inferred.email,
-        mensaje: joined,
+        mensaje: t,
         mensajeSource: usedVoiceThisSession ? "voz" : "texto",
         metadata: buildMeta()
       };
@@ -554,51 +603,88 @@
     }
 
     /**
-     * Webhook n8n RAG (phase chat) — respuesta JSON con campo `reply`.
+     * Texto del asistente desde la respuesta del webhook n8n (varios formatos habituales).
      */
-    async function postRagChat(ragUrl, cfg, userText) {
-      const res = await fetch(ragUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phase: "chat",
-          mensaje: userText,
-          associateSlug: String(cfg.associateSlug || "casetodo-carlos-ruiz"),
-          channel: String(cfg.ragChannel || "web_chat_rag"),
-          mensajeSource: usedVoiceThisSession ? "voz" : "texto",
-          metadata: buildMeta()
-        }),
-        mode: "cors",
-        cache: "no-store"
-      });
-      const raw = await res.text();
-      let reply = "";
-      if (res.ok && raw.trim()) {
-        try {
-          const data = JSON.parse(raw);
-          if (typeof data.reply === "string") reply = data.reply.trim();
-        } catch (e) {
-          void e; // @strip
+    function extractReplyFromRagJson(data) {
+      if (data == null) return "";
+      if (typeof data === "string") return data.trim();
+      if (typeof data !== "object") return "";
+
+      if (typeof data.reply === "string") return data.reply.trim();
+      if (typeof data.output === "string") return data.output.trim();
+      if (typeof data.text === "string") return data.text.trim();
+      if (typeof data.response === "string") return data.response.trim();
+      if (data.message && typeof data.message === "object") {
+        const mc = data.message.content;
+        if (typeof mc === "string") return mc.trim();
+      }
+      if (typeof data.message === "string") return data.message.trim();
+
+      if (data.choices && Array.isArray(data.choices) && data.choices[0]) {
+        const m = data.choices[0].message;
+        if (m && typeof m.content === "string") return String(m.content).trim();
+      }
+
+      if (data.body && typeof data.body === "object") {
+        const b = extractReplyFromRagJson(data.body);
+        if (b) return b;
+      }
+      if (data.json && typeof data.json === "object") {
+        const j = extractReplyFromRagJson(data.json);
+        if (j) return j;
+      }
+      if (data.data && typeof data.data === "object") {
+        const d = extractReplyFromRagJson(data.data);
+        if (d) return d;
+      }
+
+      if (Array.isArray(data)) {
+        for (let i = 0; i < data.length; i++) {
+          const r = extractReplyFromRagJson(data[i]);
+          if (r) return r;
         }
       }
-      return { ok: res.ok, reply, status: res.status };
+      return "";
     }
 
-    function parseStructuredMensaje(res) {
-      return res.text().then((raw) => {
-        const trimmed = raw.trim();
-        if (!trimmed) return "";
-        try {
-          const data = JSON.parse(trimmed);
-          if (typeof data.structuredMensaje === "string") return data.structuredMensaje;
-          if (data.body && typeof data.body.structuredMensaje === "string") {
-            return data.body.structuredMensaje;
+    /**
+     * Webhook n8n RAG (phase chat). Solo el turno actual; historial y captación en el flujo n8n.
+     */
+    async function postRagChat(ragUrl, cfg, userText) {
+      const payload = {
+        phase: "chat",
+        mensaje: String(userText || "").trim(),
+        associateSlug: String(cfg.associateSlug || "casetodo-carlos-ruiz"),
+        channel: String(cfg.ragChannel || "web_chat_rag"),
+        mensajeSource: usedVoiceThisSession ? "voz" : "texto",
+        metadata: buildMeta()
+      };
+      try {
+        const res = await fetch(ragUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          mode: "cors",
+          cache: "no-store"
+        });
+        const raw = await res.text();
+        let reply = "";
+        if (res.ok && raw.trim()) {
+          const trimmed = raw.trim();
+          try {
+            const data = JSON.parse(trimmed);
+            reply = extractReplyFromRagJson(data);
+            syncGestorFromResponse(data);
+          } catch (e) {
+            void e; // @strip
+            if (!/^[\[{]/.test(trimmed)) reply = trimmed;
           }
-        } catch (e) {
-          /* not JSON */ // @strip
         }
-        return "";
-      });
+        return { ok: res.ok, reply, status: res.status, networkError: false };
+      } catch (err) {
+        console.warn("[rag chat]", err); // @strip
+        return { ok: false, reply: "", status: 0, networkError: true };
+      }
     }
 
     function setChatBusy(busy) {
@@ -622,15 +708,11 @@
         phase: "submit",
         associateSlug: base.associateSlug,
         channel: base.channel,
-        intent: base.intent,
-        nombre: base.nombre,
-        telefono: base.telefono,
-        email: base.email,
         mensajeOriginal: base.mensaje,
         structuredMensaje: structuredText,
         clientConfirmed: true,
         mensajeSource: base.mensajeSource,
-        metadata: buildMeta()
+        metadata: base.metadata || buildMeta()
       };
 
       setStatus("Enviando al equipo…", false);
@@ -686,19 +768,32 @@
       if (chatInput) chatInput.value = "";
 
       if (ragUrl) {
-        setStatus("Consultando la guía…", false);
+        setStatus("Consultando…", false);
         setChatBusy(true);
         try {
-          const { ok, reply, status } = await postRagChat(ragUrl, cfg, text);
-          const out =
-            reply ||
-            (ok
-              ? "No recibí texto de respuesta. Probá de nuevo o escribinos por WhatsApp."
-              : `No pude contactar la guía ahora (código ${status}). Probá más tarde o usá WhatsApp.`);
-          appendChatMessage("bot", out);
-        } catch (err) {
-          console.warn("[rag chat]", err); // @strip
-          appendChatMessage("bot", "Hubo un error de red. Reintentá en un momento o usá WhatsApp.");
+          const { ok, reply, status, networkError } = await postRagChat(ragUrl, cfg, text);
+          const flujoCompletado =
+            String(gestorState.pasoActual || "").toLowerCase() === "completado";
+          if (networkError) {
+            appendChatMessage(
+              "bot",
+              flujoCompletado
+                ? "No pudimos conectar con el servidor en este momento. Tus datos ya quedaron registrados; el asesor te contactará pronto. Si urge, escribinos por WhatsApp."
+                : "No se pudo conectar con el asistente. Si el sitio está en GitHub Pages, puede ser CORS; probá desde esta misma máquina con npm start o usá el Worker del repo."
+            );
+          } else {
+            const out =
+              reply && String(reply).trim()
+                ? String(reply).trim()
+                : ok
+                  ? "Sin texto en la respuesta. En n8n, «Respond to Webhook» debe devolver JSON con «reply» (o «output» / «text»)."
+                  : status === 404
+                    ? flujoCompletado
+                      ? "El servidor del asistente respondió 404 (revisá en n8n que el workflow esté activo y la URL en .env / n8n-webhook.config.js). Tus datos ya están registrados; el equipo te contactará igualmente."
+                      : "Webhook no disponible (404). Revisá la URL en n8n y en n8n-webhook.config.js / .env."
+                    : `Error ${status}. Revisá la ejecución en n8n.`;
+            appendChatMessage("bot", out);
+          }
         } finally {
           setChatBusy(false);
           clearAllStatus();
@@ -706,42 +801,8 @@
         return;
       }
 
-      const two = cfg.twoPhaseSubmit !== false;
-      if (!two) {
-        sessionMensajeParts.push(text);
-        const base = collectBasePayload(cfg);
-        await sendSubmit(base, base.mensaje, cfg);
-        return;
-      }
-
-      sessionMensajeParts.push(text);
-      const base = collectBasePayload(cfg);
-
-      setStatus("Ordenando tu mensaje…", false);
-      setChatBusy(true);
-      try {
-        const res = await postWebhook(url, { ...base, phase: "structure" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const structured = await parseStructuredMensaje(res);
-        if (!structured.trim()) throw new Error("empty structured");
-        lastStructuredText = structured.trim();
-        appendChatMessage(
-          "bot",
-          `Resumen para el equipo:\n\n${lastStructuredText}\n\nLo envío tal cual…`
-        );
-        clearAllStatus();
-        await sendSubmit(base, lastStructuredText, cfg);
-      } catch (err) {
-        console.warn("[n8n modal structure]", err); // @strip
-        sessionMensajeParts.pop();
-        appendChatMessage(
-          "bot",
-          "No pude ordenar el mensaje ahora. Reintentá con otras palabras o usá el formulario / WhatsApp."
-        );
-        setStatus("Reintentá el envío o contactá por WhatsApp.", true);
-      } finally {
-        setChatBusy(false);
-      }
+      const base = collectBasePayloadFromMessage(text, cfg);
+      await sendSubmit(base, base.mensaje, cfg);
     }
 
     chatSend?.addEventListener("click", () => {

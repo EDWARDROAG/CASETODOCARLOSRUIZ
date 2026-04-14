@@ -52,11 +52,13 @@
    * Ejemplo: https://n8n.tu-dominio.com/webhook/casetodo-lead-modal
    * Dejala vacía hasta tener la URL; en GitHub Pages el asistente mostrará el aviso de “no activo”.
    */
-  var N8N_WEBHOOK_URL_PRODUCTION = "";
+  var N8N_WEBHOOK_URL_PRODUCTION = "https://n8n.platform.magnusai.co/webhook-test/casetodo-web-chat-v2";
 
-  /** Webhook del flujo RAG (phase chat) — Production en n8n (Magnus AI). */
+  /**
+   * GitHub Pages: si hay error CORS, usá Worker (`cloudflare-worker-rag-cors-proxy.js`) o pedí CORS en Magnus.
+   */
   var N8N_RAG_WEBHOOK_URL_PRODUCTION =
-    "https://n8n.platform.magnusai.co/webhook/casetodo-rag-chat";
+    "https://n8n.platform.magnusai.co/webhook-test/casetodo-web-chat-v2";
 
   function resolveWebhookUrl() {
     try {
@@ -81,6 +83,9 @@
     try {
       var host = (window.location && window.location.hostname) || "";
       var path = ((window.location && window.location.pathname) || "").toLowerCase();
+      if (host === "127.0.0.1" || host === "localhost") {
+        return "/api/n8n-rag";
+      }
       var onCasetodoGithubPages =
         host === "edwardroag.github.io" && path.indexOf("casetodocarlosruiz") !== -1;
       if (onCasetodoGithubPages) {
