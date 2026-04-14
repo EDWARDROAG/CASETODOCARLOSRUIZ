@@ -84,9 +84,9 @@ window.CONFIG = {
     
     descripcion: "Somos tu mejor opción en artículos de papelería, regalos personalizados y accesorios tecnológicos. Con más de 15 años de experiencia ofreciendo calidad y los mejores precios.",
     
-    telefono: "573001234567",
+    telefono: "573118100228",
     
-    whatsapp: "573001234567",
+    whatsapp: "573118100228",
     
     email: "contacto@papelerialaesquina.com",
     

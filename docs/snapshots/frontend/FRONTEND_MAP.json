@@ -1,0 +1,219 @@
+{
+    "architecture": "Arquitectura no detectada",
+    "modules": {
+        "backend-config.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "backend-config.json"
+            ]
+        },
+        "config.js": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "config.js"
+            ]
+        },
+        "n8n-code-normalizar-entrada-chat.js": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-code-normalizar-entrada-chat.js"
+            ]
+        },
+        "n8n-webhook.config.js": {
+            "pages": [],
+            "components": [],
+            "hooks": [
+                "n8n-webhook.config.js"
+            ],
+            "contexts": [],
+            "services": [],
+            "others": []
+        },
+        "n8n-workflow-casetodo-cotizacion-asistente.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-cotizacion-asistente.json"
+            ]
+        },
+        "n8n-workflow-casetodo-cotizacion-completo.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-cotizacion-completo.json"
+            ]
+        },
+        "n8n-workflow-casetodo-cotizador-simplificado.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-cotizador-simplificado.json"
+            ]
+        },
+        "n8n-workflow-casetodo-lead-modal-con-notificaciones.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-lead-modal-con-notificaciones.json"
+            ]
+        },
+        "n8n-workflow-casetodo-lead-modal-gemini.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-lead-modal-gemini.json"
+            ]
+        },
+        "n8n-workflow-casetodo-lead-modal-gmail-calendar.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-lead-modal-gmail-calendar.json"
+            ]
+        },
+        "n8n-workflow-casetodo-lead-modal.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-lead-modal.json"
+            ]
+        },
+        "n8n-workflow-casetodo-rag-pdf-chat.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-rag-pdf-chat.json"
+            ]
+        },
+        "n8n-workflow-casetodo-simple-sin-ia.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-simple-sin-ia.json"
+            ]
+        },
+        "n8n-workflow-casetodo-web-chat-openai-cotizador.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-web-chat-openai-cotizador.json"
+            ]
+        },
+        "n8n-workflow-casetodo-web-cotizador-simplificado.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-workflow-casetodo-web-cotizador-simplificado.json"
+            ]
+        },
+        "site-check.js": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "site-check.js"
+            ]
+        },
+        "site.json": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "site.json"
+            ]
+        },
+        "js": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "js\\main.js"
+            ]
+        },
+        "modulos": {
+            "pages": [],
+            "components": [],
+            "hooks": [
+                "modulos\\modal-n8n-generico\\config\\n8n-webhook.config.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-respuesta-final-webhook.js"
+            ],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "modulos\\modal-n8n-generico\\workflows\\ACTIVO\\n8n-workflow-modal-generico-activo.json",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-workflow-casetodo-web-openai-cotizador.json",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-fallback-excel.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-flags-envio-pdf.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-generar-html.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-gestor-contacto.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-gestor-datos-especificos.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-gestor-medidas.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-gestor-tipo-persona.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-normalizar.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-post-ia-detectar.js",
+                "modulos\\modal-n8n-generico\\workflows\\VERSIONES\\n8n-cotizacion-completo\\code-preparar-ia-cierre.js"
+            ]
+        },
+        "n8n-simple-sin-ia": {
+            "pages": [],
+            "components": [],
+            "hooks": [],
+            "contexts": [],
+            "services": [],
+            "others": [
+                "n8n-simple-sin-ia\\code-gestor-casetodo-simple-sin-ia.js"
+            ]
+        }
+    }
+}

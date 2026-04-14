@@ -1,6 +1,6 @@
 /* Asistente flotante (formato referencia restaurante Yaruba: panel + lanzador) */
 .casetodo-chat-widget {
-  --casetodo-chat-w: min(380px, calc(100vw - 24px));
+  --casetodo-chat-w: min(340px, calc(100vw - 24px));
   --casetodo-launcher-size: 58px;
   --casetodo-launcher-bottom: 92px;
   font-family: system-ui, "Segoe UI", sans-serif;
@@ -74,7 +74,7 @@
   bottom: calc(var(--casetodo-launcher-bottom) + 8px);
   z-index: 10061;
   width: var(--casetodo-chat-w);
-  max-height: min(520px, 70vh);
+  max-height: min(680px, 84vh);
   display: flex;
   flex-direction: column;
   border-radius: 20px;
@@ -167,7 +167,7 @@
   overflow-y: auto;
   flex: 1 1 auto;
   min-height: 160px;
-  max-height: min(400px, 56vh);
+  max-height: min(520px, 68vh);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -308,11 +308,62 @@
 }
 
 .casetodo-chat-panel .n8n-chat__thread {
-  max-height: min(400px, 56vh);
+  max-height: min(520px, 68vh);
   min-height: 160px;
   background: transparent;
   border: none;
   padding: 8px 4px 4px;
+}
+
+.casetodo-chat-panel__wa-cta {
+  margin: 8px 12px 2px;
+  padding: 9px 10px;
+  border-radius: 12px;
+  background: rgba(37, 211, 102, 0.12);
+  border: 1px solid rgba(18, 140, 126, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.casetodo-chat-panel__wa-text {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #1a3a52;
+  font-weight: 600;
+}
+
+.casetodo-chat-panel__wa-btn {
+  align-self: flex-start;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: #fff;
+  background: linear-gradient(120deg, #25d366, #128c7e);
+  box-shadow: 0 4px 12px rgba(18, 140, 126, 0.35);
+  animation: casetodo-wa-blink 1.2s ease-in-out infinite;
+}
+
+.casetodo-chat-panel__wa-btn:hover {
+  filter: brightness(1.06);
+}
+
+@keyframes casetodo-wa-blink {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(18, 140, 126, 0.35);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.25);
+  }
 }
 
 .casetodo-chat-panel .n8n-chat__msg--bot .n8n-chat__bubble {

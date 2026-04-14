@@ -80,7 +80,7 @@
  */
 
 (function initFrontCasetodo() {
-  const WHATSAPP_NUMBER = "573001234567";
+  const WHATSAPP_NUMBER = "573118100228";
 
   function goWhatsapp(message) {
     const encoded = encodeURIComponent(message.trim());

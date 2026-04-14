@@ -1,0 +1,404 @@
+################################################################################
+# ENCABEZADOS - Solo bloque /** ... */ del INICIO del archivo
+# CONTEXTO OBLIGATORIO: Leer CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones
+################################################################################
+
+
+================================================================================
+ARCHIVO: backend-config.json
+HASH: 28deb7a33c738735690085962f8a6553
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: config.js
+HASH: 5cf795ef7906d7e7f06ed1c0af42f374
+----------------------------------------
+/**
+ * ============================================================================
+ * ARCHIVO: config.js
+ * RUTA:    frontend/templates/base-papeleria/config.js
+ * VERSIÓN: 2.1.0
+ * ============================================================================
+ * 
+ * PROPÓSITO:
+ *   Archivo de configuración central para la plantilla de papelería.
+ *   Todos los datos personalizables del sitio se definen aquí.
+ * 
+ * ARQUITECTURA:
+ *   Capa: frontend
+ *   Rol:  configuración
+ * 
+ * DEPENDENCIAS:
+ *   - Ninguna (objeto global window.CONFIG)
+ * 
+ * EXPORTA:
+ *   - window.CONFIG → objeto global con toda la configuración
+ *   - module.exports → para uso en Node.js (scripts)
+ * 
+ * ============================================================================
+ * RESPONSABILIDADES:
+ *   ✔ Definir datos de la empresa (nombre, contacto, redes)
+ *   ✔ Configurar colores y apariencia visual
+ *   ✔ Definir categorías de productos
+ *   ✔ Configurar endpoints de API
+ *   ✔ Establecer textos y mensajes predeterminados
+ *   
+ *   ✖ No contiene lógica de negocio
+ *   ✖ No realiza peticiones HTTP
+ *   ✖ No modifica el DOM
+ * 
+ * ============================================================================
+ * CAMBIOS:
+ *   [2026-03-04] v2.1.0 - Sistema: Actualizado para plantilla de papelería
+ *   [2026-03-04] v2.0.0 - Sistema: Versión inicial
+ * ============================================================================
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-code-normalizar-entrada-chat.js
+HASH: c870203600085eecb50cb526b4ba7464
+----------------------------------------
+/**
+ * Pegar en n8n → nodo Code «Normalizar entrada» (Run once for all items).
+ * Fusiona item + body (objeto o JSON en string) para que metadata.pasoActual del modal llegue siempre.
+ * Sincronizado con frontend/js/main.js (metadata: pasoActual, nombre, telefono, email, ragSessionId).
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-webhook.config.js
+HASH: 84e41e2432d301f21bb5a37e2d6abc4c
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-cotizacion-asistente.json
+HASH: 8610bac0fa625825338f09d7721d8877
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-cotizacion-completo.json
+HASH: 584dbf1cddd2b71f4dcc29fc1569a10a
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-cotizador-simplificado.json
+HASH: 9af7e6a00d6833fe761fe16f8f36eb00
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-lead-modal-con-notificaciones.json
+HASH: 8cb66c034fa234d4fb7954840943ee1d
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-lead-modal-gemini.json
+HASH: 7cb42d56e1011f878b13cfa9903a028f
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-lead-modal-gmail-calendar.json
+HASH: f701f71156bb8ff0712c71c5625f844b
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-lead-modal.json
+HASH: be6b73289e6cb7e09fda7fd10fcf237d
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-rag-pdf-chat.json
+HASH: 4608a8f617e4ef582f86e772d36f18c4
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-simple-sin-ia.json
+HASH: 528ab47aabadf50bd54792faa0cd69f6
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-web-chat-openai-cotizador.json
+HASH: 4b06604f01a33cae059aebdaa43944d4
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-workflow-casetodo-web-cotizador-simplificado.json
+HASH: 9b2352cf9020dc9994a6f83f8b3a1958
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: site-check.js
+HASH: 69f63182dd93f715e687ad7d37f9f51f
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: site.json
+HASH: c5f70413e610c639402661371efc98dd
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: js\main.js
+HASH: 99c79e355b57d9c82f3b278e7ee56e67
+----------------------------------------
+/**
+ * ======================================================
+ * ARCHIVO: main.js
+ * UBICACIÓN: associates/casetodo-carlos-ruiz/frontend/js/
+ * VERSIÓN: 5.0 - Sin captación en front: solo mensaje + metadata; n8n infiere y guarda historial
+ * ÚLTIMA ACTUALIZACIÓN: 2026-04-13
+ *
+ * 🎯 PROPÓSITO:
+ * Gestionar la interacción del sitio de Casetodo Carlos Ruiz.
+ * Construye mensajes para WhatsApp desde botones de productos
+ * y desde el formulario de requerimientos de cotización.
+ * Modal chat (voz o texto): ragWebhookUrl (phase chat) y/o webhookUrl (solo submit con el texto enviado).
+ *
+ * ======================================================
+ * 📋 REGLAS PARA PRODUCCIÓN:
+ * ---
+ * - Console marcados con // @strip se eliminan en build para cliente
+ * - Esta cabecera se elimina en versión para cliente
+ *
+ * ======================================================
+ * 📋 HISTORIAL DE CAMBIOS:
+ * ---
+ * [5.0] - 2026-04-13
+ * ✅ Eliminada inferencia intent/contacto en front; submit solo mensaje + metadata. RAG sin `conversation`
+ *
+ * [4.9] - 2026-04-13
+ * ✅ RAG: body solo `mensaje` + `conversation: []` (contexto en n8n); sin two-phase/structure en el chat
+ *
+ * [4.8] - 2026-04-13
+ * ✅ Chat RAG: historial conversation con role assistant + user; metadata.ragSessionId por sesión de modal
+ *
+ * [4.7] - 2026-04-13
+ * ✅ postRagChat: tolera JSON de n8n (reply, output, text, body/json, arrays, choices OpenAI)
+ *
+ * [4.6] - 2026-04-12 16:40
+ * ✅ postRagChat incluye `conversation` (últimos turnos) para orquestación de saludo/datos
+ * [4.5] - 2026-04-12 16:05
+ * ✅ Texto de ayuda cuando el proxy devuelve 404 desde n8n (Production / workflow activo)
+ * [4.4] - 2026-04-12 14:12
+ * ✅ postRagChat: metadata gestor (pasoActual, nombre, telefono, email) ↔ n8n; el modal no se cierra entre turnos (solo al enviar al equipo o cerrar).
+ * ✅ n8n Gestor: si el primer mensaje no es solo un saludo, se toma como nombre y se pide el teléfono.
+ * ✅ postRagChat captura fallos de red/CORS; localhost usa /api/n8n-rag (dev-server)
+ * [4.3] - 2026-04-11 22:50
+ * ✅ ragWebhookUrl → POST phase chat y burbuja con reply; sin bloque inicial largo; sin botones; twoPhase+webhook envía al equipo tras structure automático
+ * [4.2] - 2026-04-11 21:40
+ * ✅ Eliminados pie de ayuda, details y casilla; fase 2 en franja mínima; aviso compat. mic como mensaje del bot al intentar usarlo
+ * [4.1] - 2026-04-11 20:15
+ * ✅ Compositor estilo WhatsApp (campo + mic + envío circular); sin placeholder largo; dictados múltiples concatenan y disparan structure/submit tras pausa
+ * [4.0] - 2026-04-12 17:05
+ * ✅ UI asistente alineada a vitrina Yaruba: widget fijo, panel is-open, velo, botón lanzador
+ * [3.9] - 2026-04-12 14:20
+ * ✅ Al abrir modal: aviso explícito si no hay webhookUrl (GitHub sin N8N_WEBHOOK_URL_PRODUCTION o sin n8n-webhook.config.js)
+ * [3.8] - 2026-04-12 12:05
+ * ✅ Sin paso de casillas: chat visible al abrir; saludo del bot definido en JS (no en n8n); inferencia básica de contacto desde el texto
+ *
+ * [3.7] - 2026-04-12 11:20
+ * ✅ UI del modal: asistente con ícono obra (casco naranja), etiquetas Tú/Asistente, textos más cercanos
+ *
+ * [3.6] - 2026-04-11 18:30
+ * ✅ Modal reformulado como chat (burbujas, compositor, mismas fases n8n)
+ *
+ * [3.5] - 2026-04-11 17:05
+ * ✅ Tras submit OK: si la respuesta JSON trae `message`, se muestra en el modal
+ *
+ * [3.4] - 2026-04-10 22:20
+ * ✅ Micrófono, organizar vía phase structure, confirmar y enviar phase submit
+ *
+ * [3.3] - 2026-04-10 21:05
+ * ✅ Modal de solicitud al equipo (POST JSON a webhook); textos de UI sin “n8n”
+ *
+ * [3.2] - 2026-04-10 14:22
+ * ✅ Se añade rotación automática de imágenes en hero con transición suave
+ *
+ * [3.1] - 2026-04-10 14:05
+ * ✅ Se agregan contadores animados al entrar en viewport
+ *
+ * [3.0] - 2026-04-09 10:40
+ * ✅ Reemplazo total por lógica de formulario y CTA de WhatsApp
+ * ======================================================
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\config\n8n-webhook.config.js
+HASH: 32c46b082f52e0f7015274aa3c826252
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\ACTIVO\n8n-workflow-modal-generico-activo.json
+HASH: 528ab47aabadf50bd54792faa0cd69f6
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-workflow-casetodo-web-openai-cotizador.json
+HASH: b17ebf353f6944647219964ed6cbae93
+----------------------------------------
+(Sin cabecera JSDoc al inicio - ver CABECERA_ESPECIFICACION.md (en raiz del proyecto) - formato y convenciones)
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-fallback-excel.js
+HASH: aa92cfcaa1506204d6d2f8265929465e
+----------------------------------------
+/**
+ * Nodo: Fallback Excel (precios embebidos; sustituir por Google Sheets si preferís)
+ * Si la IA falló, genera mensaje funcional con precio recalculado desde tabla fija.
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-flags-envio-pdf.js
+HASH: 16eb55f5d305ed42f652372b4ce7d9ed
+----------------------------------------
+/**
+ * Nodo: Tras generar PDF (binario), define si se envía por correo y/o Telegram según pendingPdf.
+ * Reenvía el binario del PDF sin modificarlo.
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-generar-html.js
+HASH: 68eb37f01642e3cd351944289cb0a24f
+----------------------------------------
+/**
+ * Nodo: Code generar HTML (cotización para PDF)
+ * Sustituye placeholders; bloques condicionales sin Handlebars (if manual).
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-gestor-contacto.js
+HASH: d3a198abfe096531ded86ae60ffe3a32
+----------------------------------------
+/**
+ * Nodo: Code fase contacto
+ * Pasos: ASK_NOMBRE → ASK_TEL → ASK_EMAIL → ASK_CIUDAD → ASK_QUOTE_CONFIRM
+ * Persistencia: $getWorkflowStaticData('global').sessions[sessionId]
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-gestor-datos-especificos.js
+HASH: ef95111e2fc989c249054a85b26dae25
+----------------------------------------
+/**
+ * Nodo: Code datos específicos
+ * Natural: ASK_DOCUMENTO → ASK_DIRECCION
+ * Empresa: ASK_NOMBRE_EMPRESA → ASK_NIT → ASK_DIRECCION_EMPRESA
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-gestor-medidas.js
+HASH: 69882cc4f1a7f9738fa83c65e18acea0
+----------------------------------------
+/**
+ * Nodo: Code medidas casetón
+ * ASK_TIPO_CASETON → ASK_MEDIDAS (largo x ancho x alto opcional) → ASK_CONFIRMAR_ENVIO
+ * Calcula precio orientativo (m²) y opcionalmente dispara pipeline PDF.
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-gestor-tipo-persona.js
+HASH: f8edc8f95a68850bb73ea1fe7aaf0b64
+----------------------------------------
+/**
+ * Nodo: Code tipo persona
+ * Paso: ASK_TIPO_PERSONA → fija tipoPersona y primer paso de datos específicos.
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-normalizar.js
+HASH: d6dce869e893cb0b46d42e420f19c34a
+----------------------------------------
+/**
+ * Nodo: Normalizar entrada (cotización completa)
+ * Normaliza body JSON del Webhook y expone metadata + ragSessionId.
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-post-ia-detectar.js
+HASH: 4307f2991504fab6248c28dd2874272b
+----------------------------------------
+/**
+ * Nodo: Post AI Agent — extrae texto y marca si hubo fallo (para IF + fallback Excel).
+ * El AI Agent devuelve el JSON en el item actual; el contexto previo viene del nodo «Preparar IA cierre».
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-preparar-ia-cierre.js
+HASH: 8e5de02983853794af83314ba6d3a608
+----------------------------------------
+/**
+ * Nodo: Preparar prompt IA (cierre comercial)
+ * Arma el texto de usuario para el AI Agent (Gemini) sin inventar datos fuera de sess.
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: modulos\modal-n8n-generico\workflows\VERSIONES\n8n-cotizacion-completo\code-respuesta-final-webhook.js
+HASH: 66e93ea06868dbe814a40769311a61f8
+----------------------------------------
+/**
+ * Nodo: Armar JSON final para Respond to Webhook (tras envíos email/telegram).
+ */
+================================================================================
+
+================================================================================
+ARCHIVO: n8n-simple-sin-ia\code-gestor-casetodo-simple-sin-ia.js
+HASH: c595247a1c8f636927e876ece300421a
+----------------------------------------
+/**
+ * Gestor de cotización sin IA
+ * Estados: INIT → ASK_NAME → ASK_PHONE → ASK_EMAIL → ASK_PETICION → ASK_CONFIRMAR → ASK_MEDIO → DONE
+ */
+================================================================================
+
+
+################################################################################
+# ESTADÍSTICAS
+################################################################################
+Total archivos procesados: 33
+Con cabecera JSDoc: 15
+Sin cabecera: 18

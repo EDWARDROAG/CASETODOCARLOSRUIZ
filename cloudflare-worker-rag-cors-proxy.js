@@ -27,7 +27,7 @@
 
 /** Webhook Production n8n (destino real). */
 const UPSTREAM_RAG_WEBHOOK =
-  "https://n8n.platform.magnusai.co/webhook-test/casetodo-web-chat-v2";
+  "https://n8n.platform.magnusai.co/webhook/casetodo-web-chat-v2";
 
 /** Origen del sitio estático (ajustá si cambiás usuario o repo en GitHub Pages). */
 const ALLOW_ORIGIN = "https://edwardroag.github.io";

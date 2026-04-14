@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cotización Casetodo Carlos Ruiz</title>
+</head>
+<body style="font-family: Arial, sans-serif; padding: 40px;">
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h1>Casetodo Carlos Ruiz</h1>
+    <p>casetones para construcción | Colombia</p>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h2>Cotización #{{quoteNumber}}</h2>
+    <p>Fecha: {{fecha}}</p>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h3>Datos del cliente</h3>
+    <p><strong>Nombre:</strong> {{nombre}}</p>
+    {{bloqueDocumento}}
+    {{bloqueEmpresa}}
+    <p><strong>Dirección:</strong> {{direccion}}</p>
+    <p><strong>Teléfono:</strong> {{telefono}} | <strong>Email:</strong> {{email}}</p>
+    <p><strong>Ciudad:</strong> {{ciudad}}</p>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h3>Detalle de la cotización</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr style="background: #f0f0f0;">
+        <th style="padding: 10px; border: 1px solid #ddd;">Producto</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Medidas</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Valor unitario (m²)</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Total</th>
+      </tr>
+      <tr>
+        <td style="padding: 10px; border: 1px solid #ddd;">Casetón {{tipoCaseton}}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{medidas}}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{precioUnitario}} COP</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{precioTotal}} COP</td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="margin-top: 40px; font-size: 12px; color: #666;">
+    <p>Esta cotización tiene una vigencia de 30 días. Para aceptarla, por favor contactar a nuestro equipo comercial.</p>
+    <p>¡Gracias por confiar en Casetodo Carlos Ruiz!</p>
+  </div>
+</body>
+</html>

@@ -27,6 +27,9 @@ TestResults.xml
 
 # Environment
 .env
+.env.*
+!.env.example
+!backend/.env.example
 
 # Logs
 *.log
@@ -35,6 +38,7 @@ logs/
 # Node (IMPORTANTE)
 node_modules/
 package-lock.json
+scripts/
 
 # OS files
 .DS_Store
@@ -57,3 +61,24 @@ build/
 # n8n — exportaciones de workflows (no versionar; n8n-webhook.config.js sí: GitHub Pages lo necesita en el repo)
 **/n8n-workflow*.json
 **/n8n-*-workflow*.json
+
+# Memoria operativa privada (no subir)
+PROJECT_MEMORY.md
+PROJECT_RULES_MEMORY.md
+contexto.md
+TRAZABILIDAD_INTEGRIDAD_SEGURIDAD.md
+PROJECT_STRUCTURE.txt
+
+# Seguridad: secretos y credenciales
+**/*secret*
+**/*secrets*
+**/*credential*
+**/*credentials*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.crt
+**/*.cer
+**/id_rsa
+**/id_ed25519
