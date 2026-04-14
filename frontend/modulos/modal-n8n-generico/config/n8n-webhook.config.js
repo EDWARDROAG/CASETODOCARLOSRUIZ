@@ -1,10 +1,10 @@
 // n8n-webhook.config.js - MODULO GENERICO
 (function defineN8nWebhookConfig() {
   // URL del webhook en n8n (produccion)
-  var N8N_WEBHOOK_URL_PRODUCTION = "https://n8n.platform.magnusai.co/webhook-test/casetodo-web-chat-v2";
+  var N8N_WEBHOOK_URL_PRODUCTION = "https://n8n.platform.magnusai.co/webhook/casetodo-web-chat-v2";
 
   // URL para chat RAG
-  var N8N_RAG_WEBHOOK_URL_PRODUCTION = "https://n8n.platform.magnusai.co/webhook-test/casetodo-web-chat-v2";
+  var N8N_RAG_WEBHOOK_URL_PRODUCTION = "https://n8n.platform.magnusai.co/webhook/casetodo-web-chat-v2";
 
   function resolveWebhookUrl() {
     try {
