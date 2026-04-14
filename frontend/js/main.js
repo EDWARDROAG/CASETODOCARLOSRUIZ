@@ -289,6 +289,8 @@
     let micAutoSendTimer = null;
     let micTurnHadTranscript = false;
     const MIC_SETTLE_MS = 820;
+    /** Turnos previos al mensaje actual (user / assistant) para n8n RAG. */
+    let ragConversationHistory = [];
 
     function clearMicAutoSendTimer() {
       if (micAutoSendTimer != null) {
@@ -490,6 +492,7 @@
         enviarCotizacionCorreoEquipo: false,
         enviarConfirmacionCliente: false
       };
+      ragConversationHistory = [];
       if (chatMessages) chatMessages.textContent = "";
       if (chatInput) chatInput.value = "";
       form.reset();
@@ -520,6 +523,7 @@
         enviarCotizacionCorreoEquipo: false,
         enviarConfirmacionCliente: false
       };
+      ragConversationHistory = [];
       if (chatMessages) chatMessages.textContent = "";
       if (chatInput) chatInput.value = "";
     }
@@ -648,14 +652,16 @@
     }
 
     /**
-     * Webhook n8n RAG (phase chat). Solo el turno actual; historial y captación en el flujo n8n.
+     * Webhook n8n RAG (phase chat). Envía `mensaje` + `conversation` (turnos previos); captación en n8n.
      */
-    async function postRagChat(ragUrl, cfg, userText) {
+    async function postRagChat(ragUrl, cfg, userText, conversationHistory) {
+      const ch = String(cfg.ragChannel || cfg.channel || "web_chat_rag").trim() || "web_chat_rag";
       const payload = {
         phase: "chat",
         mensaje: String(userText || "").trim(),
         associateSlug: String(cfg.associateSlug || "casetodo-carlos-ruiz"),
-        channel: String(cfg.ragChannel || "web_chat_rag"),
+        channel: ch,
+        conversation: Array.isArray(conversationHistory) ? conversationHistory : [],
         mensajeSource: usedVoiceThisSession ? "voz" : "texto",
         metadata: buildMeta()
       };
@@ -771,7 +777,8 @@
         setStatus("Consultando…", false);
         setChatBusy(true);
         try {
-          const { ok, reply, status, networkError } = await postRagChat(ragUrl, cfg, text);
+          const prior = ragConversationHistory.map((t) => ({ role: t.role, content: t.content }));
+          const { ok, reply, status, networkError } = await postRagChat(ragUrl, cfg, text, prior);
           const flujoCompletado =
             String(gestorState.pasoActual || "").toLowerCase() === "completado";
           if (networkError) {
@@ -793,6 +800,10 @@
                       : "Webhook no disponible (404). Revisá la URL en n8n y en n8n-webhook.config.js / .env."
                     : `Error ${status}. Revisá la ejecución en n8n.`;
             appendChatMessage("bot", out);
+          }
+          if (!networkError && ok && reply && String(reply).trim()) {
+            ragConversationHistory.push({ role: "user", content: text });
+            ragConversationHistory.push({ role: "assistant", content: String(reply).trim() });
           }
         } finally {
           setChatBusy(false);
