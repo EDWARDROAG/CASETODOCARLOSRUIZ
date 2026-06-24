@@ -1,0 +1,31 @@
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-column">
+      <h3>{{ site.companyName }}</h3>
+      <p>
+        {{ site.tagline }}, con más de {{ site.yearsExperience }} años de experiencia y más de
+        {{ site.projectsCount }} obras realizadas.
+      </p>
+      <p class="footer-nit">NIT {{ site.nit }}</p>
+    </div>
+    <div class="footer-column">
+      <h3>Contacto</h3>
+      <ul class="contact-list">
+        <li>📞 {{ site.whatsappDisplay }}</li>
+        <li>✉️ {{ site.email }}</li>
+        <li>⏰ {{ site.schedule }}</li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h3>Menú</h3>
+      <ul class="footer-menu">
+        @for (link of site.navLinks; track link.id) {
+          <li><a [href]="'#' + link.id" (click)="scrollTo(link.id, $event)">{{ link.label }}</a></li>
+        }
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© {{ year }} {{ site.shortName }}. Todos los derechos reservados.</p>
+  </div>
+</footer>

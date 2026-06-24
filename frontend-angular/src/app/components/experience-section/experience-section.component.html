@@ -1,0 +1,13 @@
+<section id="experiencia" class="section stats">
+  <div class="section-heading">
+    <h2>Nuestra <span>experiencia</span></h2>
+  </div>
+  <div class="stats-grid">
+    @for (stat of site.stats; track stat.label) {
+      <article class="stat-card">
+        <h3 [appAnimateCounter]="stat.target" [counterSuffix]="stat.suffix">0{{ stat.suffix }}</h3>
+        <p>{{ stat.label }}</p>
+      </article>
+    }
+  </div>
+</section>

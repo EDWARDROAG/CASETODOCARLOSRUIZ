@@ -36,7 +36,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = Number(process.env.PORT || 8080);
+const PORT = Number(process.env.PORT || 5508);
 const N8N_WEBHOOK_URL = String(process.env.N8N_WEBHOOK_URL || '').trim();
 const FRONTEND_DIR = path.join(__dirname, 'frontend');
 const UPSTREAM_TIMEOUT_MS = 28000;

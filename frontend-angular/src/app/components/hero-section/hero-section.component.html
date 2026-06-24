@@ -1,0 +1,27 @@
+<section id="inicio" class="hero">
+  <div
+    class="hero-bg-layer"
+    [class.is-active]="frontIsLayerA"
+    [style.backgroundImage]="bgUrl(activeIndex)"
+  ></div>
+  <div
+    class="hero-bg-layer"
+    [class.is-active]="!frontIsLayerA"
+    [style.backgroundImage]="bgUrl((activeIndex + 1) % site.heroImages.length)"
+  ></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-badge">{{ site.heroBadge }}</p>
+    <h1>{{ site.tagline }}</h1>
+    <p>{{ site.description }}</p>
+    <div class="hero-cta">
+      <a href="#contacto" class="btn-primary" (click)="scrollToContact($event)">Solicitar cotización</a>
+      <button type="button" class="btn-secondary" (click)="openAssistant.emit()" aria-haspopup="dialog">
+        Hablar con {{ site.assistantName }}
+      </button>
+      <button type="button" class="btn-secondary btn-wa-hero" (click)="openWhatsapp()">
+        Hablar por WhatsApp
+      </button>
+    </div>
+  </div>
+</section>

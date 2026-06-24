@@ -1,0 +1,63 @@
+<section id="contacto" class="section quote-section">
+  <div class="section-heading">
+    <h2>Solicita tu <span>cotización</span></h2>
+  </div>
+  <p class="quote-intro">
+    Completa tu requerimiento y te llevamos directamente a WhatsApp con el mensaje listo para enviar.
+  </p>
+
+  <form class="quote-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <label>
+        Nombre completo
+        <input type="text" formControlName="nombre" />
+      </label>
+      <label>
+        Empresa
+        <input type="text" formControlName="empresa" />
+      </label>
+      <label>
+        Teléfono de contacto
+        <input type="tel" formControlName="telefono" />
+      </label>
+      <label>
+        Tipo de servicio
+        <select formControlName="servicio">
+          <option value="">Selecciona</option>
+          <option value="Venta">Venta</option>
+          <option value="Alquiler">Alquiler</option>
+        </select>
+      </label>
+      <label>
+        Tipo de casetón
+        <select formControlName="tipoCaseton">
+          <option value="">Selecciona</option>
+          @for (tipo of site.casetonTypes; track tipo) {
+            <option [value]="tipo">{{ tipo }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Cantidad estimada
+        <input type="number" min="1" formControlName="cantidad" />
+      </label>
+      <label>
+        Ciudad / lugar de obra
+        <input type="text" formControlName="ciudad" />
+      </label>
+      <label>
+        Fecha requerida
+        <input type="date" formControlName="fecha" />
+      </label>
+    </div>
+    <label class="full-width">
+      Detalles adicionales del requerimiento
+      <textarea
+        formControlName="detalles"
+        rows="4"
+        placeholder="Área de la losa, plazo, tipo de proyecto, etc."
+      ></textarea>
+    </label>
+    <button type="submit" class="btn-primary">Enviar requerimiento por WhatsApp</button>
+  </form>
+</section>

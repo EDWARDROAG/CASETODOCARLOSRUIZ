@@ -1,0 +1,21 @@
+{
+  "/api/n8n-rag": {
+    "target": "https://n8n.platform.magnusai.co",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": { "^/api/n8n-rag": "/webhook/casetodo-web-chat-v2" },
+    "logLevel": "warn"
+  },
+  "/api/n8n-lead": {
+    "target": "https://n8n.platform.magnusai.co",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": { "^/api/n8n-lead": "/webhook/casetodo-web-chat-v2" },
+    "logLevel": "warn"
+  },
+  "/api": {
+    "target": "http://127.0.0.1:3008",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

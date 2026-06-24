@@ -1,0 +1,19 @@
+<section id="casetones" class="section">
+  <div class="section-heading">
+    <h2>Tipos de <span>casetón</span></h2>
+  </div>
+  <div class="cards-grid">
+    @for (product of site.products; track product.id) {
+      <article class="product-card">
+        <img [src]="product.image" [alt]="product.name" />
+        <div class="product-content">
+          <h3>{{ product.name }}</h3>
+          <p>{{ product.description }}</p>
+          <button type="button" class="btn-whatsapp-producto" (click)="consult(product.name)">
+            Consultar disponibilidad
+          </button>
+        </div>
+      </article>
+    }
+  </div>
+</section>

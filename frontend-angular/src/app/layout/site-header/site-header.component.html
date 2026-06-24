@@ -1,0 +1,18 @@
+<header class="header">
+  <div class="logo">
+    <img [src]="site.logoUrl" [alt]="site.shortName" />
+    <div class="logo-text">
+      <strong>{{ site.shortName }}</strong>
+      <span>{{ site.tagline }}</span>
+    </div>
+  </div>
+
+  <nav class="nav">
+    @for (link of site.navLinks; track link.id) {
+      <a [href]="'#' + link.id" (click)="scrollTo(link.id, $event)">{{ link.label }}</a>
+    }
+    <button type="button" class="nav-assistant" (click)="openAssistant.emit()" aria-haspopup="dialog">
+      Hablar con {{ site.assistantName }}
+    </button>
+  </nav>
+</header>

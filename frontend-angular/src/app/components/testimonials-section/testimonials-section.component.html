@@ -1,0 +1,13 @@
+<section id="clientes" class="section">
+  <div class="section-heading">
+    <h2>Clientes que nos <span>recomiendan</span></h2>
+  </div>
+  <div class="cards-grid">
+    @for (item of site.testimonials; track item.author) {
+      <article class="testimonial-card">
+        <p>"{{ item.quote }}"</p>
+        <h4>{{ item.author }}</h4>
+      </article>
+    }
+  </div>
+</section>

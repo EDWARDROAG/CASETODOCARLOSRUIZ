@@ -1,0 +1,64 @@
+# Despliega el frontend Angular en GitHub Pages al hacer push a main.
+# URL pública: https://edwardroag.github.io/CASETODOCARLOSRUIZ/
+#
+# Requisito (una sola vez en GitHub):
+#   Settings → Pages → Build and deployment → Source: GitHub Actions
+
+name: Deploy frontend (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend-angular/package.json
+
+      - name: Instalar dependencias (frontend-angular)
+        working-directory: frontend-angular
+        run: npm install
+
+      - name: Build Angular para GitHub Pages
+        working-directory: frontend-angular
+        run: npm run build:github-pages
+
+      - name: SPA fallback (404 → index.html)
+        run: |
+          OUT="frontend-angular/dist/frontend-angular/browser"
+          cp "$OUT/index.html" "$OUT/404.html"
+
+      - name: Subir artefacto a GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend-angular/dist/frontend-angular/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
