@@ -39,40 +39,53 @@ En `frontend/` hay workflows exportables para **importar en n8n**:
 
 Para **Gmail + Calendar**: crea credenciales OAuth2 en n8n (Gmail y Google Calendar), importa `n8n-workflow-casetodo-lead-modal-gmail-calendar.json`, asigna credenciales a los nodos, ajusta `sendTo` del correo al equipo y el calendario destino. El evento usa por defecto **mañana 10:00–10:30** (lógica en el nodo *Preparar envío equipo*); cámbiala si necesitas otra ventana u huso horario.
 
-### GitHub Pages — despliegue automático (Angular)
+### GitHub Pages + dominio `casetodocarlosruiz.com.co`
 
-**URL pública:** https://edwardroag.github.io/CASETODOCARLOSRUIZ/
+**URL principal:** https://casetodocarlosruiz.com.co  
+**Respaldo (GitHub):** https://edwardroag.github.io/CASETODOCARLOSRUIZ/
 
-Cada **push a `main`** ejecuta el workflow `.github/workflows/deploy-frontend-pages.yml`, que:
+Cada **push a `main`** despliega el Angular con `baseHref: /` y el archivo `CNAME` incluido en el build.
 
-1. Instala dependencias en `frontend-angular/`
-2. Compila con `npm run build:github-pages` (`baseHref: /CASETODOCARLOSRUIZ/`)
-3. Publica el artefacto en GitHub Pages
+#### 1. DNS en tu registrador (.com.co)
 
-**Configuración única en GitHub (si aún no está hecha):**
+En el panel del dominio que compraste, crea estos registros:
 
-1. Repo → **Settings** → **Pages**
+| Tipo | Nombre / Host | Valor | TTL |
+|------|----------------|-------|-----|
+| **A** | `@` (raíz / casetodocarlosruiz.com.co) | `185.199.108.153` | 3600 |
+| **A** | `@` | `185.199.109.153` | 3600 |
+| **A** | `@` | `185.199.110.153` | 3600 |
+| **A** | `@` | `185.199.111.153` | 3600 |
+| **CNAME** | `www` | `edwardroag.github.io` | 3600 |
+
+(IPs oficiales de [GitHub Pages](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-an-apex-domain).)
+
+La propagación DNS puede tardar **15 minutos a 48 horas**.
+
+#### 2. GitHub (una sola vez)
+
+1. Repo **CASETODOCARLOSRUIZ** → **Settings** → **Pages**
 2. **Build and deployment** → **Source:** `GitHub Actions`
-3. Hacer push a `main` o ejecutar el workflow manualmente en **Actions** → *Deploy frontend (GitHub Pages)* → **Run workflow**
+3. En **Custom domain** escribe: `casetodocarlosruiz.com.co` → **Save**
+4. Cuando DNS esté bien, activa **Enforce HTTPS**
+5. (Opcional) Añade también `www.casetodocarlosruiz.com.co` si tu registrador lo permite en GitHub
 
-**Desarrollo local del front:**
-
-```bash
-cd frontend-angular
-npm install
-npm start
-```
-
-**Build igual al de producción (Pages):**
+#### 3. Desplegar cambios
 
 ```bash
-cd frontend-angular
-npm run build:github-pages
+git push origin main
 ```
 
-**Asistente Alexa (n8n) en producción:** las URLs van en `frontend-angular/src/environments/environment.prod.ts`. Desde `github.io` el navegador llama directo a n8n; si hay error CORS, habilitar el origen `https://edwardroag.github.io` en el proxy de n8n o usar el Worker `cloudflare-worker-rag-cors-proxy.js`.
+O en **Actions** → *Deploy frontend (GitHub Pages)* → **Run workflow**.
 
-**Nota:** el backend (`puerto 3008`) no se despliega con este workflow; solo el frontend visual. Cuando migren a hosting propio, se añadirá un pipeline aparte.
+#### Asistente Alexa (CORS)
+
+En producción el chat llama a n8n desde `casetodocarlosruiz.com.co`. Si falla por CORS, en Magnus/n8n deben permitir el origen:
+
+- `https://casetodocarlosruiz.com.co`
+- `https://www.casetodocarlosruiz.com.co`
+
+O desplegar de nuevo el Worker `cloudflare-worker-rag-cors-proxy.js` (ya acepta esos orígenes).
 
 ## Docker (solo backend)
 1. En `backend/` crear `.env` desde `.env.example`

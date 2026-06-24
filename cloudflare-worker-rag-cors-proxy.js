@@ -29,12 +29,22 @@
 const UPSTREAM_RAG_WEBHOOK =
   "https://n8n.platform.magnusai.co/webhook/casetodo-web-chat-v2";
 
-/** Origen del sitio estático (ajustá si cambiás usuario o repo en GitHub Pages). */
-const ALLOW_ORIGIN = "https://edwardroag.github.io";
+/** Orígenes permitidos del sitio (dominio propio + respaldo GitHub Pages). */
+const ALLOWED_ORIGINS = new Set([
+  "https://casetodocarlosruiz.com.co",
+  "https://www.casetodocarlosruiz.com.co",
+  "https://edwardroag.github.io"
+]);
 
-function corsHeaders(extra = {}) {
+function resolveAllowOrigin(request) {
+  const origin = request.headers.get("Origin") || "";
+  if (ALLOWED_ORIGINS.has(origin)) return origin;
+  return "https://casetodocarlosruiz.com.co";
+}
+
+function corsHeaders(request, extra = {}) {
   return {
-    "Access-Control-Allow-Origin": ALLOW_ORIGIN,
+    "Access-Control-Allow-Origin": resolveAllowOrigin(request),
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Accept",
     "Access-Control-Max-Age": "86400",
@@ -45,13 +55,13 @@ function corsHeaders(extra = {}) {
 export default {
   async fetch(request) {
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders() });
+      return new Response(null, { status: 204, headers: corsHeaders(request) });
     }
 
     if (request.method !== "POST") {
       return new Response(JSON.stringify({ error: "method_not_allowed", reply: "" }), {
         status: 405,
-        headers: corsHeaders({ "Content-Type": "application/json; charset=utf-8" })
+        headers: corsHeaders(request, { "Content-Type": "application/json; charset=utf-8" })
       });
     }
 
@@ -69,7 +79,7 @@ export default {
 
     return new Response(text, {
       status: upstream.status,
-      headers: corsHeaders({
+      headers: corsHeaders(request, {
         "Content-Type": base.includes("application/json")
           ? "application/json; charset=utf-8"
           : `${base}; charset=utf-8`

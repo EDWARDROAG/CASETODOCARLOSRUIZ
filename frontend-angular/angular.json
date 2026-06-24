@@ -81,7 +81,7 @@
               ]
             },
             "github-pages": {
-              "baseHref": "/CASETODOCARLOSRUIZ/",
+              "baseHref": "/",
               "budgets": [
                 {
                   "type": "initial",

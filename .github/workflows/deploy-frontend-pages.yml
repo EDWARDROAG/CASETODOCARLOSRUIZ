@@ -1,5 +1,5 @@
 # Despliega el frontend Angular en GitHub Pages al hacer push a main.
-# URL pública: https://edwardroag.github.io/CASETODOCARLOSRUIZ/
+# Dominio: https://casetodocarlosruiz.com.co
 #
 # Requisito (una sola vez en GitHub):
 #   Settings → Pages → Build and deployment → Source: GitHub Actions
