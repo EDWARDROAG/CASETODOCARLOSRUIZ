@@ -1,0 +1,57 @@
+# Generado por scripts/client-vitrina-deploy/detect-and-deploy.js — regenerar con --init-ci --force
+# ⚠️ Este workflow NO publica en Pages — no muestra "View deployment".
+# Para publicar y ver la URL: ejecutar "Deploy vitrina (Pages)".
+
+name: CI vitrina
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  frontend-public-smoke:
+    name: Frontend público — archivos clave
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend-angular/package.json
+
+      - name: Instalar dependencias (frontend-angular)
+        working-directory: frontend-angular
+        run: npm install
+
+      - name: Build Angular para GitHub Pages
+        working-directory: frontend-angular
+        run: npm run build:github-pages
+
+      - name: Verificar estructura mínima
+        run: |
+          test -f frontend-angular/dist/frontend-angular/browser/index.html
+          test -d frontend-angular/dist/frontend-angular/browser/assets
+          test -f scripts/client-vitrina-deploy/detect-and-deploy.js
+          echo "OK: vitrina lista para Pages"
+
+      - name: Resumen (solo verificación — no despliega)
+        run: |
+          SITE="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo "=============================================="
+          echo "CI OK — este workflow NO publica en Pages"
+          echo "URL del sitio (cuando Deploy vitrina termina bien): $SITE"
+          echo "Ejecutá: Actions → Deploy frontend (GitHub Pages) → Run workflow"
+          echo "=============================================="
+          echo "## CI vitrina — verificación OK" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Este workflow **no publica** en GitHub Pages. Solo comprueba que existan los archivos." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**URL esperada del sitio:** [$SITE]($SITE)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Para publicar y ver el enlace **View deployment**, ejecutá el workflow **Deploy frontend (GitHub Pages)**." >> "$GITHUB_STEP_SUMMARY"
