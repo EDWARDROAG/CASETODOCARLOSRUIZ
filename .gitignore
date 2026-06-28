@@ -40,6 +40,24 @@ node_modules/
 package-lock.json
 scripts/
 
+# Solo local — no publicar en GitHub
+backend/
+frontend_antiguo/
+deploy-vitrina/
+docs/
+especificaciones cliente/
+
+# Legacy raíz (sitio HTML antiguo; la vitrina es frontend-angular/)
+/index.html
+/config.js
+/n8n-webhook.config.js
+/site-check.js
+/dev-server.mjs
+/cloudflare-worker-rag-cors-proxy.js
+/CONFIGURACION-INDEPENDIENTE.txt
+/package.json
+/package-lock.json
+
 # OS files
 .DS_Store
 Thumbs.db

@@ -37,7 +37,6 @@ jobs:
         run: |
           test -f frontend-angular/dist/frontend-angular/browser/index.html
           test -d frontend-angular/dist/frontend-angular/browser/assets
-          test -f scripts/client-vitrina-deploy/detect-and-deploy.js
           echo "OK: vitrina lista para Pages"
 
       - name: Resumen (solo verificación — no despliega)
